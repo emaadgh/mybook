@@ -4,6 +4,6 @@ namespace MyBook.Services
 {
     public interface IMyBookRepository
     {
-        Task<Book?> GetBookAsync(int id);
+        Task<Book?> GetBookAsync(Guid id);
     }
 }

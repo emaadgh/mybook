@@ -13,7 +13,7 @@ namespace MyBook.Services
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
-        public async Task<Book?> GetBookAsync(int id)
+        public async Task<Book?> GetBookAsync(Guid id)
         {
             return await _dbContext.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
         }

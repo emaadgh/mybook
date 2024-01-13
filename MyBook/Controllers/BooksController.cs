@@ -19,7 +19,7 @@ namespace MyBook.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> GetBook(int id)
+        public async Task<ActionResult> GetBook(Guid id)
         {
             var book = await _myBookRepository.GetBookAsync(id);
 
