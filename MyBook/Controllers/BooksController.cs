@@ -31,5 +31,18 @@ namespace MyBook.Controllers
             return Ok(_mapper.Map<BookDto>(book));
         }
 
+        [Route("all")]
+        [HttpGet]
+        public async Task<ActionResult> GetBooks(Guid authorId)
+        {
+            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            {
+                return NotFound();
+            }
+            var booksForAuthor = await _myBookRepository.GetBooksAsync(authorId);
+
+            return Ok(_mapper.Map<IEnumerable<BookDto>>(booksForAuthor));
+        }
+
     }
 }
