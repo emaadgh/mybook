@@ -7,5 +7,7 @@ namespace MyBook.Services
         Task<IEnumerable<Book?>> GetBooksAsync(Guid authorId);
         Task<Book?> GetBookAsync(Guid id);
         Task<bool> AuthorExistsAsync(Guid authorId);
+        void AddBook(Guid authorId, Book book);
+        Task<bool> SaveAsync();
     }
 }

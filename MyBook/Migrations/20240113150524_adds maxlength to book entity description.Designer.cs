@@ -12,8 +12,8 @@ using MyBook.DbContexts;
 namespace MyBook.API.Migrations
 {
     [DbContext(typeof(MyBookDbContext))]
-    [Migration("20240113071235_Initialize")]
-    partial class Initialize
+    [Migration("20240113150524_adds maxlength to book entity description")]
+    partial class addsmaxlengthtobookentitydescription
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,9 +54,15 @@ namespace MyBook.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("255bb1cb-6f9b-44dc-b48c-56836ad5d9ad"),
+                            Id = new Guid("ad3d0a3d-006d-4a2d-817b-114cf7e22904"),
                             DateOfBirth = new DateTimeOffset(new DateTime(1947, 9, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
                             Name = "Stephen King"
+                        },
+                        new
+                        {
+                            Id = new Guid("d3b05403-79b9-460a-9d5e-a3641fd5a1b2"),
+                            DateOfBirth = new DateTimeOffset(new DateTime(1952, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
+                            Name = "Douglas Adams"
                         });
                 });
 
@@ -66,11 +72,15 @@ namespace MyBook.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Category")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(1500)
+                        .HasColumnType("nvarchar(1500)");
 
                     b.Property<string>("ISBN")
                         .HasColumnType("nvarchar(max)");
@@ -87,12 +97,15 @@ namespace MyBook.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AuthorId");
+
                     b.ToTable("Books");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fe576c14-8d43-4fd3-8931-0c99b54abd9b"),
+                            Id = new Guid("f989c252-418e-465e-bafd-81951e72dccc"),
+                            AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439785960",
                             PublicationDate = new DateTimeOffset(new DateTime(2006, 9, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
                             Publisher = "Scholastic Inc.",
@@ -100,12 +113,24 @@ namespace MyBook.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("c8a8b39a-8c87-4bd8-a66a-ce14e7448030"),
+                            Id = new Guid("da4324fa-f23f-4bb0-88ba-724a3a0869c7"),
+                            AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439358078",
                             PublicationDate = new DateTimeOffset(new DateTime(2004, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
                             Publisher = "Scholastic Inc.",
                             Title = "Harry Potter and the Order of the Phoenix (Harry Potter  #5)"
                         });
+                });
+
+            modelBuilder.Entity("MyBook.Entities.Book", b =>
+                {
+                    b.HasOne("MyBook.Entities.Author", "Author")
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Author");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using MyBook.DbContexts;
 namespace MyBook.API.Migrations
 {
     [DbContext(typeof(MyBookDbContext))]
-    [Migration("20240113075802_adds author to book")]
-    partial class addsauthortobook
+    [Migration("20240113145551_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,9 +54,15 @@ namespace MyBook.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("e5f9e85f-2f65-4c82-9812-3aa7ea5dba07"),
+                            Id = new Guid("ad3d0a3d-006d-4a2d-817b-114cf7e22904"),
                             DateOfBirth = new DateTimeOffset(new DateTime(1947, 9, 21, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
                             Name = "Stephen King"
+                        },
+                        new
+                        {
+                            Id = new Guid("d3b05403-79b9-460a-9d5e-a3641fd5a1b2"),
+                            DateOfBirth = new DateTimeOffset(new DateTime(1952, 3, 11, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
+                            Name = "Douglas Adams"
                         });
                 });
 
@@ -97,7 +103,7 @@ namespace MyBook.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b6f2f771-bc6f-4c63-88b0-9e77d9b5b2a0"),
+                            Id = new Guid("182e6f43-5c70-48ee-8c51-7d815c982d4f"),
                             AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439785960",
                             PublicationDate = new DateTimeOffset(new DateTime(2006, 9, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
@@ -106,7 +112,7 @@ namespace MyBook.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("31d14414-9bb5-4f94-9b50-b773a85cd44e"),
+                            Id = new Guid("f1926f10-5d9c-4f45-a460-7e0c8e2683be"),
                             AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439358078",
                             PublicationDate = new DateTimeOffset(new DateTime(2004, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),

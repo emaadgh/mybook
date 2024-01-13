@@ -23,8 +23,13 @@ namespace MyBook.DbContexts
                 },
                 new Author("Stephen King")
                 {
-                    Id = Guid.NewGuid(),
+                    Id = Guid.Parse("ad3d0a3d-006d-4a2d-817b-114cf7e22904"),
                     DateOfBirth = new DateTime(1947, 9, 21)
+                },
+                new Author("Douglas Adams")
+                {
+                    Id = Guid.Parse("d3b05403-79b9-460a-9d5e-a3641fd5a1b2"),
+                    DateOfBirth = new DateTime(1952, 3, 11)
                 });
 
             modelBuilder.Entity<Book>().HasData(

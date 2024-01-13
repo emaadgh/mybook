@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MyBook.API.Models;
 using MyBook.Entities;
 using MyBook.Models;
 
@@ -8,7 +9,8 @@ namespace MyBook.API.Profiles
     {
         public BookProfile() 
         {
-            CreateMap<Book, BookDto>();
+            CreateMap<Book, BookDto>().ReverseMap();
+            CreateMap<BookForCreationDto, Book>();
         }
     }
 }

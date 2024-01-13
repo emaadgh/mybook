@@ -9,6 +9,7 @@ namespace MyBook.Entities
         [Required]
         public string Title { get; set; }
         public string? ISBN { get; set; }
+        [MaxLength(1500)]
         public string? Description { get; set; }
         public string? Category { get; set; }
         public DateTimeOffset PublicationDate { get; set; }
