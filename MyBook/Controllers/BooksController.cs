@@ -60,7 +60,7 @@ namespace MyBook.Controllers
 
             var bookToReturn = _mapper.Map<BookDto>(bookEntity);
 
-            return CreatedAtRoute("GetBook", bookToReturn.Id, bookToReturn);
+            return CreatedAtRoute("GetBook", new { bookToReturn.Id }, bookToReturn);
         }
 
     }

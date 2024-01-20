@@ -101,7 +101,7 @@ namespace MyBook.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("f989c252-418e-465e-bafd-81951e72dccc"),
+                            Id = new Guid("0d35c02d-11f2-4fad-9b76-e2562538c6fa"),
                             AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439785960",
                             PublicationDate = new DateTimeOffset(new DateTime(2006, 9, 16, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
@@ -110,7 +110,7 @@ namespace MyBook.API.Migrations
                         },
                         new
                         {
-                            Id = new Guid("da4324fa-f23f-4bb0-88ba-724a3a0869c7"),
+                            Id = new Guid("1a177495-2212-4a00-94cf-8d1e91086f41"),
                             AuthorId = new Guid("a4848a8c-49ed-45ec-9ef8-ea3761793db4"),
                             ISBN = "439358078",
                             PublicationDate = new DateTimeOffset(new DateTime(2004, 9, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 3, 30, 0, 0)),
