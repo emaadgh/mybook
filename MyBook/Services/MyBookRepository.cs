@@ -48,6 +48,16 @@ namespace MyBook.Services
             return await _dbContext.Authors.AnyAsync(a => a.Id == authorId);
         }
 
+        public void UpdateBook(Book book)
+        {
+            // not needed for this implementation
+        }
+
+        public void DeleteBook(Book book)
+        {
+            _dbContext.Books.Remove(book);
+        }
+
         public async Task<bool> SaveAsync()
         {
             return (await _dbContext.SaveChangesAsync() > 0);

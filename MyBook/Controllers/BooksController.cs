@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyBook.API.Models;
+using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
 
@@ -63,5 +63,51 @@ namespace MyBook.Controllers
             return CreatedAtRoute("GetBook", new { bookToReturn.Id }, bookToReturn);
         }
 
+        [HttpPut]
+        public async Task<ActionResult> UpdateBook(Guid bookId, Guid authorId, BookForUpdateDto book)
+        {
+            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            {
+                return NotFound();
+            }
+
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+
+            if (bookFromRepo == null)
+            {
+                var bookToAdd = _mapper.Map<Book>(book);
+
+                _myBookRepository.AddBook(authorId, bookToAdd);
+                await _myBookRepository.SaveAsync();
+
+                var bookToReturn = _mapper.Map<BookDto>(bookToAdd);
+
+                return CreatedAtRoute("GetBook", new { bookToReturn.Id }, bookToReturn);
+            }
+
+            _mapper.Map(book, bookFromRepo);
+
+            _myBookRepository.UpdateBook(bookFromRepo);
+
+            await _myBookRepository.SaveAsync();
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        public async Task<ActionResult> DeleteBook(Guid bookId)
+        {
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+
+            if(bookFromRepo == null)
+            {
+                return NotFound();
+            }
+
+            _myBookRepository.DeleteBook(bookFromRepo);
+            await _myBookRepository.SaveAsync();
+
+            return NoContent();
+        }
     }
 }
