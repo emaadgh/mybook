@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MyBook.API.Models;
 using MyBook.Entities;
@@ -94,12 +95,62 @@ namespace MyBook.Controllers
             return NoContent();
         }
 
+        [HttpPatch]
+        public async Task<ActionResult> PartiallyUpdateBook(Guid bookId, Guid authorId
+            , JsonPatchDocument<BookForUpdateDto> patchDocument)
+        {
+            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            {
+                return NotFound();
+            }
+
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+
+            if (bookFromRepo == null)
+            {
+                var bookDto = new BookForUpdateDto();
+
+                patchDocument.ApplyTo(bookDto, ModelState);
+
+                if (!TryValidateModel(bookDto))
+                {
+                    return ValidationProblem(ModelState);
+                }
+
+                var bookToAdd = _mapper.Map<Book>(bookDto);
+                bookToAdd.Id = bookId;
+
+                _myBookRepository.AddBook(authorId, bookToAdd);
+                await _myBookRepository.SaveAsync();
+
+                var bookToReturn = _mapper.Map<BookDto>(bookToAdd);
+
+                return CreatedAtRoute("GetBook", new { bookId }, bookToReturn);
+            }
+
+            var bookToPatch = _mapper.Map<BookForUpdateDto>(bookFromRepo);
+            patchDocument.ApplyTo(bookToPatch, ModelState);
+
+            if (!TryValidateModel(bookToPatch))
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            _mapper.Map(bookToPatch, bookFromRepo);
+
+            _myBookRepository.UpdateBook(bookFromRepo);
+
+            await _myBookRepository.SaveAsync();
+
+            return NoContent();
+        }
+
         [HttpDelete]
         public async Task<ActionResult> DeleteBook(Guid bookId)
         {
             var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
 
-            if(bookFromRepo == null)
+            if (bookFromRepo == null)
             {
                 return NotFound();
             }

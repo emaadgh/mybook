@@ -11,7 +11,7 @@ namespace MyBook.API.Profiles
         {
             CreateMap<Book, BookDto>().ReverseMap();
             CreateMap<BookForCreationDto, Book>();
-            CreateMap<BookForUpdateDto, Book>();
+            CreateMap<BookForUpdateDto, Book>().ReverseMap();
         }
     }
 }
