@@ -39,6 +39,13 @@ namespace MyBook.Services
                 collection = collection.Where(b => b.AuthorId == booksResourceParameters.AuthorId);
             }
 
+            if (booksResourceParameters.SearchQuery != null)
+            {
+                collection = collection.Where(b =>
+                    (b.Title + b.Description + b.Publisher + b.ISBN + b.Category + b.Author.Name + b.Author.Description)
+                    .Contains(booksResourceParameters.SearchQuery));
+            }
+
             return await collection.ToListAsync();
         }
 
