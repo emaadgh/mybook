@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MyBook.API.Models;
+using MyBook.API.ResourceParameters;
 using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
@@ -35,15 +36,11 @@ namespace MyBook.Controllers
 
         [Route("all")]
         [HttpGet]
-        public async Task<ActionResult> GetBooks(Guid authorId)
+        public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
-            if (!await _myBookRepository.AuthorExistsAsync(authorId))
-            {
-                return NotFound();
-            }
-            var booksForAuthor = await _myBookRepository.GetBooksAsync(authorId);
+            var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
 
-            return Ok(_mapper.Map<IEnumerable<BookDto>>(booksForAuthor));
+            return Ok(_mapper.Map<IEnumerable<BookDto>>(books));
         }
 
         [HttpPost]

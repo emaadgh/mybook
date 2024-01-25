@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyBook.API.ResourceParameters;
 using MyBook.DbContexts;
 using MyBook.Entities;
 
@@ -18,10 +19,29 @@ namespace MyBook.Services
             return await _dbContext.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Book?>> GetBooksAsync(Guid authorId)
+        public async Task<IEnumerable<Book?>> GetBooksAsync(BooksResourceParameters booksResourceParameters)
         {
-            return await _dbContext.Books.Where(b => b.AuthorId == authorId).ToListAsync();
+            if (booksResourceParameters == null)
+            {
+                throw new ArgumentNullException(nameof(booksResourceParameters));
+            }
+
+            var collection = _dbContext.Books as IQueryable<Book>;
+
+            if (!string.IsNullOrEmpty(booksResourceParameters.PublisherName))
+            {
+                var publisherName = booksResourceParameters.PublisherName.Trim();
+                collection = collection.Where(b => b.Publisher == publisherName);
+            }
+
+            if (booksResourceParameters.AuthorId != null)
+            {
+                collection = collection.Where(b => b.AuthorId == booksResourceParameters.AuthorId);
+            }
+
+            return await collection.ToListAsync();
         }
+
         public void AddBook(Guid authorId, Book book)
         {
             if (authorId == Guid.Empty)
