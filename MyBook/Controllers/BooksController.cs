@@ -6,6 +6,7 @@ using MyBook.API.ResourceParameters;
 using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
+using System.Text.Json;
 
 namespace MyBook.Controllers
 {
@@ -39,6 +40,17 @@ namespace MyBook.Controllers
         public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
             var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
+
+            var paginationMetadata = new
+            {
+                totalCount = books.TotalCount,
+                pageSize = books.PageSize,
+                currentPage = books.CurrentPage,
+                totalPages = books.TotalPages
+            };
+
+            Response.Headers.Append("X-Pagination",
+                   JsonSerializer.Serialize(paginationMetadata));
 
             return Ok(_mapper.Map<IEnumerable<BookDto>>(books));
         }

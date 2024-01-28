@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyBook.API.Helpers;
 using MyBook.API.ResourceParameters;
 using MyBook.DbContexts;
 using MyBook.Entities;
@@ -19,7 +20,7 @@ namespace MyBook.Services
             return await _dbContext.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Book?>> GetBooksAsync(BooksResourceParameters booksResourceParameters)
+        public async Task<PagedList<Book>> GetBooksAsync(BooksResourceParameters booksResourceParameters)
         {
             if (booksResourceParameters == null)
             {
@@ -46,7 +47,8 @@ namespace MyBook.Services
                     .Contains(booksResourceParameters.SearchQuery));
             }
 
-            return await collection.ToListAsync();
+            return await PagedList<Book>.CreateAsync(collection,
+                booksResourceParameters.PageNumber, booksResourceParameters.PageSize);
         }
 
         public void AddBook(Guid authorId, Book book)
