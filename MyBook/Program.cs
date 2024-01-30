@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers().AddNewtonsoftJson();
+builder.Services.AddControllers(options =>
+{
+    options.ReturnHttpNotAcceptable = true;
+}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
 
 builder.Services.AddDbContext<MyBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBookDbContextConnection")));
@@ -22,7 +25,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
