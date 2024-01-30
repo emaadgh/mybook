@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MyBook.API.Services;
 using MyBook.DbContexts;
 using MyBook.Services;
 
@@ -13,6 +14,8 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddDbContext<MyBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBookDbContextConnection")));
+
+builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
 
 builder.Services.AddScoped<IMyBookRepository, MyBookRepository>();
 

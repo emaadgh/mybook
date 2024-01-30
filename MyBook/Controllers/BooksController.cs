@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
+using MyBook.API.Services;
 using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
@@ -16,10 +17,12 @@ namespace MyBook.Controllers
     {
         private readonly IMyBookRepository _myBookRepository;
         private readonly IMapper _mapper;
-        public BooksController(IMyBookRepository myBookRepository, IMapper mapper)
+        private readonly IPropertyMappingService _propertyMappingService;
+        public BooksController(IMyBookRepository myBookRepository, IMapper mapper, IPropertyMappingService propertyMappingService)
         {
             _myBookRepository = myBookRepository ?? throw new ArgumentNullException(nameof(myBookRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         [HttpGet(Name = "GetBook")]
@@ -39,6 +42,13 @@ namespace MyBook.Controllers
         [HttpGet]
         public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
+            if (!_propertyMappingService
+            .ValidMappingExistsFor<BookDto, Book>(
+                booksResourceParameters.OrderBy))
+            {
+                return BadRequest();
+            }
+
             var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
 
             var paginationMetadata = new

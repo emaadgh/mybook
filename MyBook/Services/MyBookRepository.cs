@@ -1,18 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MyBook.API.Helpers;
 using MyBook.API.ResourceParameters;
+using MyBook.API.Services;
 using MyBook.DbContexts;
 using MyBook.Entities;
+using MyBook.Models;
 
 namespace MyBook.Services
 {
     public class MyBookRepository : IMyBookRepository
     {
         private readonly MyBookDbContext _dbContext;
+        private readonly IPropertyMappingService _propertyMappingService;
 
-        public MyBookRepository(MyBookDbContext dbContext)
+        public MyBookRepository(MyBookDbContext dbContext, IPropertyMappingService propertyMappingService)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
         public async Task<Book?> GetBookAsync(Guid id)
@@ -40,11 +45,19 @@ namespace MyBook.Services
                 collection = collection.Where(b => b.AuthorId == booksResourceParameters.AuthorId);
             }
 
-            if (booksResourceParameters.SearchQuery != null)
+            if (!string.IsNullOrEmpty(booksResourceParameters.SearchQuery))
             {
                 collection = collection.Where(b =>
                     (b.Title + b.Description + b.Publisher + b.ISBN + b.Category + b.Author.Name + b.Author.Description)
                     .Contains(booksResourceParameters.SearchQuery));
+            }
+
+            if (!string.IsNullOrEmpty(booksResourceParameters.OrderBy))
+            {
+                var bookProperyMappingDictionary = _propertyMappingService.GetPropertyMapping<BookDto, Book>();
+
+                collection = collection.ApplySort(booksResourceParameters.OrderBy,
+                bookProperyMappingDictionary);
             }
 
             return await PagedList<Book>.CreateAsync(collection,
