@@ -1,17 +1,13 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using MyBook.API.ResourceParameters;
 using MyBook.API.Services;
 using MyBook.Controllers;
 using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MyBook.Test
 {
@@ -19,15 +15,15 @@ namespace MyBook.Test
     {
         private readonly Mock<IMyBookRepository> _mockRepository;
         private readonly Mock<IMapper> _mockMapper;
-        private readonly Mock<IPropertyMappingService> _mockPropertyMappingService;
+        private readonly IPropertyMappingService _propertyMappingService;
         private readonly BooksController _controller;
 
         public BooksControllerTests()
         {
             _mockRepository = new Mock<IMyBookRepository>();
             _mockMapper = new Mock<IMapper>();
-            _mockPropertyMappingService = new Mock<IPropertyMappingService>();
-            _controller = new BooksController(_mockRepository.Object, _mockMapper.Object, _mockPropertyMappingService.Object);
+            _propertyMappingService = new PropertyMappingService();
+            _controller = new BooksController(_mockRepository.Object, _mockMapper.Object, _propertyMappingService);
         }
 
         [Fact]
@@ -39,7 +35,7 @@ namespace MyBook.Test
             book.Id = bookId;
 
             _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
-            _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(new BookDto { Id= bookId });
+            _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(new BookDto { Id = bookId });
 
             // Act
             var result = await _controller.GetBook(bookId);
@@ -63,7 +59,64 @@ namespace MyBook.Test
             var result = await _controller.GetBook(bookId);
 
             // Assert
-            var notFoundResult = Assert.IsType<NotFoundResult>(result);
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task GetBooks_InvalidOrderByParameter_MustReturnsBadRequest()
+        {
+            // Arrange
+            BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
+            booksResourceParameters.OrderBy = "NotAValidParameter";
+
+            var httpResponseHeadersMock = new Mock<IHeaderDictionary>();
+            var httpResponseMock = new Mock<HttpResponse>();
+            httpResponseMock.SetupGet(r => r.Headers).Returns(httpResponseHeadersMock.Object);
+
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.SetupGet(c => c.Response).Returns(httpResponseMock.Object);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = httpContextMock.Object
+            };
+
+            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
+
+            // Act
+            var result = await _controller.GetBooks(booksResourceParameters);
+
+            // Assert
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public async Task GetBooks_ValidOrderByParameter_MustReturnsOkObjectResult()
+        {
+            // Arrange
+            BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
+            booksResourceParameters.OrderBy = "Title";
+
+            var httpResponseHeadersMock = new Mock<IHeaderDictionary>();
+            var httpResponseMock = new Mock<HttpResponse>();
+            httpResponseMock.SetupGet(r => r.Headers).Returns(httpResponseHeadersMock.Object);
+
+            var httpContextMock = new Mock<HttpContext>();
+            httpContextMock.SetupGet(c => c.Response).Returns(httpResponseMock.Object);
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = httpContextMock.Object
+            };
+
+            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
+
+            // Act
+            var result = await _controller.GetBooks(booksResourceParameters);
+
+            // Assert
+            var okObjectResult = Assert.IsType<OkObjectResult>(result);
+            Assert.IsAssignableFrom<IEnumerable<BookDto>>(okObjectResult.Value);
         }
     }
 }
