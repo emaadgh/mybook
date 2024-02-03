@@ -8,10 +8,15 @@ namespace MyBook.Services
     {
         Task<PagedList<Book>> GetBooksAsync(BooksResourceParameters booksResourceParameters);
         Task<Book?> GetBookAsync(Guid id);
-        Task<bool> AuthorExistsAsync(Guid authorId);
         void AddBook(Guid authorId, Book book);
         void UpdateBook(Book book);
         void DeleteBook(Book book);
+        Task<bool> AuthorExistsAsync(Guid authorId);
+        Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorsResourceParameters);
+        Task<Author?> GetAuthorAsync(Guid id);
+        void AddAuthor(Author author);
+        void UpdateAuthor(Author? author);
+        void DeleteAuthor(Author author);
         Task<bool> SaveAsync();
     }
 }
