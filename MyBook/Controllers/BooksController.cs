@@ -26,6 +26,8 @@ namespace MyBook.Controllers
         }
 
         [HttpGet(Name = "GetBook")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetBook(Guid id)
         {
             var book = await _myBookRepository.GetBookAsync(id);
@@ -40,6 +42,8 @@ namespace MyBook.Controllers
 
         [Route("all")]
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
             if (!_propertyMappingService
@@ -66,6 +70,8 @@ namespace MyBook.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateBookForAuthor(Guid authorId, BookForCreationDto book)
         {
             if (!await _myBookRepository.AuthorExistsAsync(authorId))
@@ -84,6 +90,9 @@ namespace MyBook.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdateBook(Guid bookId, Guid authorId, BookForUpdateDto book)
         {
             if (!await _myBookRepository.AuthorExistsAsync(authorId))
@@ -115,6 +124,10 @@ namespace MyBook.Controllers
         }
 
         [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]        
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PartiallyUpdateBook(Guid bookId, Guid authorId
             , JsonPatchDocument<BookForUpdateDto> patchDocument)
         {
@@ -165,6 +178,8 @@ namespace MyBook.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteBook(Guid bookId)
         {
             var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);

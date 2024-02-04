@@ -28,6 +28,8 @@ namespace MyBook.API.Controllers
         }
 
         [HttpGet(Name = "GetAuthor")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> GetAuthor(Guid id)
         {
             var author = await _myBookRepository.GetAuthorAsync(id);
@@ -42,6 +44,8 @@ namespace MyBook.API.Controllers
 
         [HttpGet]
         [Route("all")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetAuthors([FromQuery] AuthorsResourceParameters authorsResourceParameters)
         {
             if (!_propertyMappingService
@@ -68,6 +72,7 @@ namespace MyBook.API.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> CreateAuthor(AuthorForCreationDto authorForCreationDto)
         {
             var authorEntity = _mapper.Map<Author>(authorForCreationDto);
@@ -81,6 +86,8 @@ namespace MyBook.API.Controllers
         }
 
         [HttpPut]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> UpdateAuthor(Guid id, AuthorForUpdateDto authorForUpdateDto)
         {
             if (!await _myBookRepository.AuthorExistsAsync(id))
@@ -100,6 +107,9 @@ namespace MyBook.API.Controllers
         }
 
         [HttpPatch]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]        
         public async Task<ActionResult> PartiallyUpdateAuthor(Guid id,
             JsonPatchDocument<AuthorForUpdateDto> patchDocument)
         {
@@ -127,6 +137,8 @@ namespace MyBook.API.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteAuthor(Guid id)
         {
             var author = await _myBookRepository.GetAuthorAsync(id);
