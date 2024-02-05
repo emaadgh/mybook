@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using MyBook.API.Helpers;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
@@ -20,13 +21,15 @@ namespace MyBook.Controllers
         private readonly IMapper _mapper;
         private readonly IPropertyMappingService _propertyMappingService;
         private readonly IPropertyCheckerService _propertyCheckerService;
+        private readonly ProblemDetailsFactory _problemDetailsFactory;
         public BooksController(IMyBookRepository myBookRepository, IMapper mapper,
-            IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService)
+            IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService, ProblemDetailsFactory problemDetailsFactory)
         {
             _myBookRepository = myBookRepository ?? throw new ArgumentNullException(nameof(myBookRepository));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
             _propertyCheckerService = propertyCheckerService;
+            _problemDetailsFactory = problemDetailsFactory;
         }
 
         [HttpGet(Name = "GetBook")]
@@ -37,7 +40,10 @@ namespace MyBook.Controllers
         {
             if (!_propertyCheckerService.TypeHasProperties<BookDto>(fields))
             {
-                return BadRequest();
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested data shaping fields exist on " +
+                    $"the resource: {fields}"));
             }
 
             var book = await _myBookRepository.GetBookAsync(id);
@@ -60,12 +66,18 @@ namespace MyBook.Controllers
             .ValidMappingExistsFor<BookDto, Book>(
                 booksResourceParameters.OrderBy))
             {
-                return BadRequest();
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested ordering fields exist on " +
+                    $"the resource: {booksResourceParameters.OrderBy}"));
             }
 
             if (!_propertyCheckerService.TypeHasProperties<BookDto>(booksResourceParameters.Fields))
             {
-                return BadRequest();
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested data shaping fields exist on " +
+                    $"the resource: {booksResourceParameters.Fields}"));
             }
 
             var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
