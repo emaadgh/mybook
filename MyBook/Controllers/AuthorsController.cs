@@ -2,6 +2,7 @@
 using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using MyBook.API.Helpers;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
 using MyBook.API.Services;
@@ -19,19 +20,28 @@ namespace MyBook.API.Controllers
         private readonly IMyBookRepository _myBookRepository;
         private readonly IMapper _mapper;
         private readonly IPropertyMappingService _propertyMappingService;
+        private readonly IPropertyCheckerService _propertyCheckerService;
 
-        public AuthorsController(IMyBookRepository myBookRepository, IMapper mapper, IPropertyMappingService propertyMappingService)
+        public AuthorsController(IMyBookRepository myBookRepository, IMapper mapper,
+            IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService)
         {
             _myBookRepository = myBookRepository;
             _mapper = mapper;
             _propertyMappingService = propertyMappingService;
+            _propertyCheckerService = propertyCheckerService;
         }
 
         [HttpGet(Name = "GetAuthor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> GetAuthor(Guid id)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> GetAuthor(Guid id, string? fields)
         {
+            if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(fields))
+            {
+                return BadRequest();
+            }
+
             var author = await _myBookRepository.GetAuthorAsync(id);
 
             if (author == null)
@@ -39,7 +49,7 @@ namespace MyBook.API.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<AuthorDto>(author));
+            return Ok(_mapper.Map<AuthorDto>(author).ShapeData(fields));
         }
 
         [HttpGet]
@@ -51,6 +61,11 @@ namespace MyBook.API.Controllers
             if (!_propertyMappingService
             .ValidMappingExistsFor<AuthorDto, Author>(
                 authorsResourceParameters.OrderBy))
+            {
+                return BadRequest();
+            }
+
+            if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(authorsResourceParameters.Fields))
             {
                 return BadRequest();
             }
@@ -68,7 +83,8 @@ namespace MyBook.API.Controllers
             Response.Headers.Append("X-Pagination",
                    JsonSerializer.Serialize(paginationMetadata));
 
-            return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authors));
+            return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authors)
+                .ShapeData(authorsResourceParameters.Fields));
         }
 
         [HttpPost]
@@ -109,7 +125,7 @@ namespace MyBook.API.Controllers
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]        
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PartiallyUpdateAuthor(Guid id,
             JsonPatchDocument<AuthorForUpdateDto> patchDocument)
         {

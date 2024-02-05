@@ -16,6 +16,7 @@ builder.Services.AddDbContext<MyBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBookDbContextConnection")));
 
 builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
+builder.Services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
 
 builder.Services.AddScoped<IMyBookRepository, MyBookRepository>();
 

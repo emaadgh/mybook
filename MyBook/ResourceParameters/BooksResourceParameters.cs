@@ -20,5 +20,7 @@
         }
 
         public string OrderBy { get; set; } = "Title";
+
+        public string? Fields { get; set; }
     }
 }
