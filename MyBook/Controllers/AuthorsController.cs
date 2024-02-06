@@ -126,7 +126,7 @@ namespace MyBook.API.Controllers
             return Ok(linkedResourcesToReturn);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateAuthor")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> CreateAuthor(AuthorForCreationDto authorForCreationDto)
         {
