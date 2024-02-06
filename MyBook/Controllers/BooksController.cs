@@ -9,6 +9,7 @@ using MyBook.API.Services;
 using MyBook.Entities;
 using MyBook.Models;
 using MyBook.Services;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 
 namespace MyBook.Controllers
@@ -22,6 +23,9 @@ namespace MyBook.Controllers
         private readonly IPropertyMappingService _propertyMappingService;
         private readonly IPropertyCheckerService _propertyCheckerService;
         private readonly ProblemDetailsFactory _problemDetailsFactory;
+
+        private readonly string _bookShapingRequiredFields = JsonNamingPolicy.CamelCase.ConvertName(nameof(BookDto.Id)) + ',' + JsonNamingPolicy.CamelCase.ConvertName(nameof(BookDto.AuthorId));
+        
         public BooksController(IMyBookRepository myBookRepository, IMapper mapper,
             IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService, ProblemDetailsFactory problemDetailsFactory)
         {
@@ -53,11 +57,15 @@ namespace MyBook.Controllers
                 return NotFound();
             }
 
-            return Ok(_mapper.Map<BookDto>(book).ShapeData(fields));
+            var links = CreateLinksForBook(id, book.AuthorId, fields);
+
+            var shapedBooks = _mapper.Map<BookDto>(book).ShapeData(fields, _bookShapingRequiredFields) as IDictionary<string, object?>;
+            shapedBooks.Add("links", links);
+
+            return Ok(shapedBooks);
         }
 
-        [Route("all")]
-        [HttpGet]
+        [HttpGet("all", Name = "GetBooks")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
@@ -93,10 +101,31 @@ namespace MyBook.Controllers
             Response.Headers.Append("X-Pagination",
                    JsonSerializer.Serialize(paginationMetadata));
 
-            return Ok(_mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields));
+            var links = CreateLinksForBooks(booksResourceParameters, books.HasNext, books.HasPrevious);
+
+            var shapedBooks = _mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields, _bookShapingRequiredFields);
+
+            var booksWithLinks = shapedBooks.Select(book =>
+            {
+                var bookDictionary = book as IDictionary<string, object?>;
+
+                var bookLinks = CreateLinksForBook((Guid)bookDictionary["Id"], (Guid)bookDictionary["AuthorId"], null);
+
+                bookDictionary.Add("links", bookLinks);
+
+                return bookDictionary;
+            });
+
+            var linkedResourcesToReturn = new
+            {
+                value = booksWithLinks,
+                links = links
+            };
+
+            return Ok(linkedResourcesToReturn);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateBookForAuthor")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateBookForAuthor(Guid authorId, BookForCreationDto book)
@@ -111,9 +140,14 @@ namespace MyBook.Controllers
             _myBookRepository.AddBook(authorId, bookEntity);
             await _myBookRepository.SaveAsync();
 
-            var bookToReturn = _mapper.Map<BookDto>(bookEntity);
+            var links = CreateLinksForBook(bookEntity.Id, authorId, null);
 
-            return CreatedAtRoute("GetBook", new { bookToReturn.Id }, bookToReturn);
+            var bookDto = _mapper.Map<BookDto>(bookEntity);
+
+            var shapedBookWithLinksToReturn = bookDto.ShapeData(null, null) as IDictionary<string, object?>;
+            shapedBookWithLinksToReturn.Add("links", links);
+
+            return CreatedAtRoute("GetBook", new { id = shapedBookWithLinksToReturn["Id"] }, shapedBookWithLinksToReturn);
         }
 
         [HttpPut]
@@ -220,6 +254,114 @@ namespace MyBook.Controllers
             await _myBookRepository.SaveAsync();
 
             return NoContent();
+        }
+
+        private List<LinkDto> CreateLinksForBook(Guid id, Guid authorId, string? fields)
+        {
+            var links = new List<LinkDto>();
+
+            if (string.IsNullOrWhiteSpace(fields))
+            {
+                links.Add(
+                  new(Url.Link("GetBook", new { id }),
+                  "self",
+                  "GET"));
+            }
+            else
+            {
+                links.Add(
+                  new(Url.Link("GetBook", new { id, fields }),
+                  "self",
+                  "GET"));
+            }
+
+            links.Add(
+                  new(Url.ActionLink("GetAuthor", "Authors", new { id = authorId }),
+                 "get_book_author",
+                 "GET"));
+
+            links.Add(
+                  new(Url.Link("CreateBookForAuthor", new { authorId }),
+                  "create_book_for_author",
+                  "POST"));
+
+            return links;
+        }
+
+        private IEnumerable<LinkDto> CreateLinksForBooks(BooksResourceParameters booksResourceParameters,
+            bool hasNext, bool hasPrevious)
+        {
+            var links = new List<LinkDto>
+            {
+                // self 
+                new(CreateBooksResourceUri(booksResourceParameters, ResourceUriType.Current),
+                    "self",
+                    "GET")
+            };
+
+            if (hasNext)
+            {
+                links.Add(
+                    new(CreateBooksResourceUri(booksResourceParameters, ResourceUriType.NextPage),
+                        "nextPage",
+                        "GET"));
+            }
+
+            if (hasPrevious)
+            {
+                links.Add(
+                    new(CreateBooksResourceUri(booksResourceParameters, ResourceUriType.PreviousPage),
+                        "previousPage",
+                        "GET"));
+            }
+
+            return links;
+        }
+
+        private string? CreateBooksResourceUri(
+            BooksResourceParameters booksResourceParameters,
+            ResourceUriType type)
+        {
+            switch (type)
+            {
+                case ResourceUriType.PreviousPage:
+                    return Url.Link("GetBooks",
+                        new
+                        {
+                            fields = booksResourceParameters.Fields,
+                            orderBy = booksResourceParameters.OrderBy,
+                            pageNumber = booksResourceParameters.PageNumber - 1,
+                            pageSize = booksResourceParameters.PageSize,
+                            searchQuery = booksResourceParameters.SearchQuery,
+                            publisherName = booksResourceParameters.PublisherName,
+                            authorId = booksResourceParameters.AuthorId
+                        });
+                case ResourceUriType.NextPage:
+                    return Url.Link("GetBooks",
+                        new
+                        {
+                            fields = booksResourceParameters.Fields,
+                            orderBy = booksResourceParameters.OrderBy,
+                            pageNumber = booksResourceParameters.PageNumber + 1,
+                            pageSize = booksResourceParameters.PageSize,
+                            searchQuery = booksResourceParameters.SearchQuery,
+                            publisherName = booksResourceParameters.PublisherName,
+                            authorId = booksResourceParameters.AuthorId
+                        });
+                case ResourceUriType.Current:
+                default:
+                    return Url.Link("GetBooks",
+                        new
+                        {
+                            fields = booksResourceParameters.Fields,
+                            orderBy = booksResourceParameters.OrderBy,
+                            pageNumber = booksResourceParameters.PageNumber,
+                            pageSize = booksResourceParameters.PageSize,
+                            searchQuery = booksResourceParameters.SearchQuery,
+                            publisherName = booksResourceParameters.PublisherName,
+                            authorId = booksResourceParameters.AuthorId
+                        });
+            }
         }
     }
 }

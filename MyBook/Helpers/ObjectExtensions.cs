@@ -6,7 +6,7 @@ namespace MyBook.API.Helpers
     public static class ObjectExtensions
     {
         public static ExpandoObject ShapeData<TSource>(this TSource source,
-         string? fields)
+         string? fields, string? requiredFields)
         {
             if (source == null)
             {
@@ -33,6 +33,19 @@ namespace MyBook.API.Helpers
                 }
 
                 return dataShapedObject;
+            }
+
+            // adds required fields to fields if they don't exist 
+            if (requiredFields != null)
+            {
+                var requiredFieldsSplit = requiredFields.Split(',');
+                foreach (var requiredField in requiredFieldsSplit)
+                {
+                    if (!fields.Contains(requiredField))
+                    {
+                        fields = fields + "," + requiredField;
+                    }
+                }
             }
 
             // the field are separated by ",", so we split it.

@@ -10,6 +10,7 @@ namespace MyBook.API.Services
         new(StringComparer.OrdinalIgnoreCase)
         {
             { "Id", new(new[] { "Id" }) },
+            { "AuthorId", new(new[] { "AuthorId" }) },
             { "Title", new(new[] { "Title" }) },
             { "ISBN", new(new[] { "ISBN" }) },
             { "Description", new(new[] { "Description" }) },

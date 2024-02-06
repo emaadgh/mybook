@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using System.Reflection;
 
 namespace MyBook.API.Helpers
@@ -8,7 +9,7 @@ namespace MyBook.API.Helpers
     {
         public static IEnumerable<ExpandoObject> ShapeData<TSource>(
             this IEnumerable<TSource> source,
-            string? fields)
+            string? fields, string? requiredFields)
         {
             if (source == null)
             {
@@ -34,7 +35,21 @@ namespace MyBook.API.Helpers
                 propertyInfoList.AddRange(propertyInfos);
             }
             else
-            {       // the field are separated by ",", so we split it.
+            {
+                // adds required fields to fields if they don't exist 
+                if (requiredFields != null)
+                {
+                    var requiredFieldsSplit = requiredFields.Split(',');
+                    foreach (var requiredField in requiredFieldsSplit)
+                    {
+                        if (!fields.Contains(requiredField))
+                        {
+                            fields = fields + "," + requiredField;
+                        }
+                    }
+                }
+
+                // the field are separated by ",", so we split it.
                 var fieldsAfterSplit = fields.Split(',');
 
                 foreach (var field in fieldsAfterSplit)
