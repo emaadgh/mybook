@@ -3,6 +3,7 @@ using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using MyBook.API.ActionConstraints;
 using MyBook.API.Helpers;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
@@ -37,10 +38,40 @@ namespace MyBook.API.Controllers
         }
 
         [HttpGet(Name = "GetAuthor")]
+        [ApiExplorerSettings(GroupName = "v1")]
+        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthor(Guid id, string? fields)
+        public async Task<ActionResult> GetAuthorWithoutLinks(Guid id, string? fields)
+        {
+            if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(fields))
+            {
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested data shaping fields exist on " +
+                    $"the resource: {fields}"));
+            }
+
+            var author = await _myBookRepository.GetAuthorAsync(id);
+
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(_mapper.Map<AuthorDto>(author).ShapeData(fields, _authorShapingRequiredFields));
+        }
+
+        [HttpGet(Name = "GetAuthorWithLinks")]
+        [ApiExplorerSettings(GroupName = "v2")]
+        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
+        [Produces("application/vnd.mybook.author.hateoas+json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> GetAuthorWithLinks(Guid id, string? fields)
         {
             if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(fields))
             {
@@ -66,9 +97,55 @@ namespace MyBook.API.Controllers
         }
 
         [HttpGet("all", Name = "GetAuthors")]
+        [ApiExplorerSettings(GroupName = "v1")]
+        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthors([FromQuery] AuthorsResourceParameters authorsResourceParameters)
+        public async Task<ActionResult> GetAuthorsWithoutLinks([FromQuery] AuthorsResourceParameters authorsResourceParameters)
+        {
+            if (!_propertyMappingService
+            .ValidMappingExistsFor<AuthorDto, Author>(
+                authorsResourceParameters.OrderBy))
+            {
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested ordering fields exist on " +
+                    $"the resource: {authorsResourceParameters.OrderBy}"));
+            }
+
+            if (!_propertyCheckerService.TypeHasProperties<AuthorDto>(authorsResourceParameters.Fields))
+            {
+                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: 400,
+                    detail: $"Not all requested data shaping fields exist on " +
+                    $"the resource: {authorsResourceParameters.Fields}"));
+            }
+
+            var authors = await _myBookRepository.GetAuthorsAsync(authorsResourceParameters);
+
+            var paginationMetadata = new
+            {
+                totalCount = authors.TotalCount,
+                pageSize = authors.PageSize,
+                currentPage = authors.CurrentPage,
+                totalPages = authors.TotalPages
+            };
+
+            Response.Headers.Append("X-Pagination",
+                   JsonSerializer.Serialize(paginationMetadata));
+
+            return Ok(_mapper.Map<IEnumerable<AuthorDto>>(authors)
+                .ShapeData(authorsResourceParameters.Fields, _authorShapingRequiredFields));
+        }
+
+        [HttpGet("all", Name = "GetAuthorsWithLinks")]
+        [ApiExplorerSettings(GroupName = "v2")]
+        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
+        [Produces("application/vnd.mybook.author.hateoas+json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> GetAuthorsWithLinks([FromQuery] AuthorsResourceParameters authorsResourceParameters)
         {
             if (!_propertyMappingService
             .ValidMappingExistsFor<AuthorDto, Author>(
@@ -221,14 +298,14 @@ namespace MyBook.API.Controllers
             if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(
-                  new(Url.Link("GetAuthor", new { id }),
+                  new(Url.Link("GetAuthorWithLinks", new { id }),
                   "self",
                   "GET"));
             }
             else
             {
                 links.Add(
-                  new(Url.Link("GetAuthor", new { id, fields }),
+                  new(Url.Link("GetAuthorWithLinks", new { id, fields }),
                   "self",
                   "GET"));
             }
@@ -283,7 +360,7 @@ namespace MyBook.API.Controllers
             switch (type)
             {
                 case ResourceUriType.PreviousPage:
-                    return Url.Link("GetAuthors",
+                    return Url.Link("GetAuthorsWithLinks",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
@@ -295,7 +372,7 @@ namespace MyBook.API.Controllers
                             fullName = authorsResourceParameters.FullName
                         });
                 case ResourceUriType.NextPage:
-                    return Url.Link("GetAuthors",
+                    return Url.Link("GetAuthorsWithLinks",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
@@ -308,7 +385,7 @@ namespace MyBook.API.Controllers
                         });
                 case ResourceUriType.Current:
                 default:
-                    return Url.Link("GetAuthors",
+                    return Url.Link("GetAuthorsWithLinks",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
