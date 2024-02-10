@@ -336,7 +336,7 @@ namespace MyBook.API.Controllers
                   "GET"));
 
             links.Add(
-                  new(Url.Link("CreateBookForAuthor", new { id }),
+                  new(Url.Link("CreateBookForAuthor", new { AuthorId = id }),
                   "create_book_for_author",
                   "POST"));
 
