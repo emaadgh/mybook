@@ -204,8 +204,28 @@ namespace MyBook.API.Controllers
         }
 
         [HttpPost(Name = "CreateAuthor")]
+        [ApiExplorerSettings(GroupName = "v1")]
+        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> CreateAuthor(AuthorForCreationDto authorForCreationDto)
+        public async Task<ActionResult> CreateAuthorWithoutLinks(AuthorForCreationDto authorForCreationDto)
+        {
+            var authorEntity = _mapper.Map<Author>(authorForCreationDto);
+
+            _myBookRepository.AddAuthor(authorEntity);
+            await _myBookRepository.SaveAsync();
+
+            var authorToReturn = _mapper.Map<AuthorDto>(authorEntity);
+
+            return CreatedAtRoute("GetAuthor", new { id = authorToReturn.Id }, authorToReturn);
+        }
+
+        [HttpPost(Name = "CreateAuthorWithLinks")]
+        [ApiExplorerSettings(GroupName = "v2")]
+        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
+        [Produces("application/vnd.mybook.author.hateoas+json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> CreateAuthorWithLinks(AuthorForCreationDto authorForCreationDto)
         {
             var authorEntity = _mapper.Map<Author>(authorForCreationDto);
 
