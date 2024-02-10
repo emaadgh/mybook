@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Azure;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -9,7 +8,6 @@ using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
 using MyBook.API.Services;
 using MyBook.Entities;
-using MyBook.Models;
 using MyBook.Services;
 using System.Text.Json;
 
@@ -331,7 +329,7 @@ namespace MyBook.API.Controllers
             }
 
             links.Add(
-                  new(Url.ActionLink("GetBooks", "Books", new { AuthorId = id }),
+                  new(Url.Link("GetBooks", new { AuthorId = id }),
                   "get_author_books",
                   "GET"));
 
