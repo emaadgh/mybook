@@ -36,7 +36,7 @@ namespace MyBook.Test
         }
 
         [Fact]
-        public async Task GetBooksWithoutLinks_BookExists_MustReturnsOkResult()
+        public async Task GetBookWithoutLinks_BookExists_MustReturnsOkResult()
         {
             // Arrange
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
@@ -57,7 +57,20 @@ namespace MyBook.Test
         }
 
         [Fact]
-        public async Task GetBooksWithoutLinks_BookNotExist_MustReturnsNotFound()
+        public async Task GetBookWithoutLinks_FieldIsInvalid_MustReturnsBadRequest()
+        {
+            // Arrange
+            var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+            string fields = "InvalidFields";
+            // Act
+            var result = await _controller.GetBookWithoutLinks(bookId, fields);
+
+            // Assert
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task GetBookWithoutLinks_BookNotExist_MustReturnsNotFound()
         {
             // Arrange
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
