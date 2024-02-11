@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.AspNetCore.Routing;
 using Moq;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
@@ -39,7 +36,7 @@ namespace MyBook.Test
         }
 
         [Fact]
-        public async Task GetBook_BookExists_MustReturnsOkResult()
+        public async Task GetBooksWithoutLinks_BookExists_MustReturnsOkResult()
         {
             // Arrange
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
@@ -49,27 +46,8 @@ namespace MyBook.Test
             _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
             _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(new BookDto { Id = bookId });
 
-            // Mocking IUrlHelper
-            var expectedProtocol = "testprotocol://";
-            var expectedHost = "www.example.com";
-
-            var httpContext = new DefaultHttpContext
-            {
-                Request =
-                {
-                    Scheme = expectedProtocol,
-                    Host = new HostString(expectedHost),
-                }
-            };
-
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            var mockUrlHelper = CreateMockUrlHelper(actionContext);
-            mockUrlHelper.Setup(h => h.RouteUrl(It.IsAny<UrlRouteContext>())).Returns("callbackUrl");
-            mockUrlHelper.Setup(h => h.Action(It.IsAny<UrlActionContext>())).Returns("callbackUrl");
-            _controller.Url = mockUrlHelper.Object;
-
             // Act
-            var result = await _controller.GetBook(bookId, null);
+            var result = await _controller.GetBookWithoutLinks(bookId, null);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -79,7 +57,7 @@ namespace MyBook.Test
         }
 
         [Fact]
-        public async Task GetBook_BookNotExist_MustReturnsNotFound()
+        public async Task GetBooksWithoutLinks_BookNotExist_MustReturnsNotFound()
         {
             // Arrange
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
@@ -88,14 +66,14 @@ namespace MyBook.Test
             _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
 
             // Act
-            var result = await _controller.GetBook(bookId, null);
+            var result = await _controller.GetBookWithoutLinks(bookId, null);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
         }
 
         [Fact]
-        public async Task GetBooks_InvalidOrderByParameter_MustReturnsBadRequest()
+        public async Task GetBooksWithoutLinks_InvalidOrderByParameter_MustReturnsBadRequest()
         {
             // Arrange
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
@@ -116,14 +94,14 @@ namespace MyBook.Test
             _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
             // Act
-            var result = await _controller.GetBooks(booksResourceParameters);
+            var result = await _controller.GetBooksWithoutLinks(booksResourceParameters);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
         }
 
         [Fact]
-        public async Task GetBooks_ValidOrderByParameter_MustReturnsOkObjectResult()
+        public async Task GetBooksWithoutLinks_ValidOrderByParameter_MustReturnsOkObjectResult()
         {
             // Arrange
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
@@ -143,63 +121,50 @@ namespace MyBook.Test
 
             _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
-            // Mocking IUrlHelper
-            var expectedProtocol = "testprotocol://";
-            var expectedHost = "www.example.com";
-
-            var httpContext = new DefaultHttpContext
-            {
-                Request =
-                {
-                    Scheme = expectedProtocol,
-                    Host = new HostString(expectedHost),
-                }
-            };
-
-            var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
-            var mockUrlHelper = CreateMockUrlHelper(actionContext);
-            mockUrlHelper.Setup(h => h.RouteUrl(It.IsAny<UrlRouteContext>())).Returns("callbackUrl");
-            mockUrlHelper.Setup(h => h.Action(It.IsAny<UrlActionContext>())).Returns("callbackUrl");
-            _controller.Url = mockUrlHelper.Object;
-
             // Act
-            var result = await _controller.GetBooks(booksResourceParameters);
+            var result = await _controller.GetBooksWithoutLinks(booksResourceParameters);
 
             // Assert
-            var okObjectResult = Assert.IsType<OkObjectResult>(result);
-        }
-        private static Mock<IUrlHelper> CreateMockUrlHelper(ActionContext context = null)
-        {
-            if (context == null)
-            {
-                context = GetActionContextForPage("/Page");
-            }
-
-            var urlHelper = new Mock<IUrlHelper>();
-            urlHelper.SetupGet(h => h.ActionContext)
-                .Returns(context);
-            return urlHelper;
+            Assert.IsType<OkObjectResult>(result);
         }
 
-        private static ActionContext GetActionContextForPage(string page)
+        [Fact]
+        public async Task CreateBookForAuthorWithoutLinks_AuthorNotExist_MustReturnsNotFound()
         {
-            return new ActionContext
-            {
-                ActionDescriptor = new ActionDescriptor
-                {
-                    RouteValues = new Dictionary<string, string>
-                    {
-                        { "page", page },
-                    },
-                },
-                RouteData = new RouteData
-                {
-                    Values =
-                    {
-                        [ "page" ] = page
-                    },
-                },
-            };
+            // Arrange
+            Guid authorId = Guid.Empty;
+
+            BookForCreationDto book = new BookForCreationDto();
+
+            // Act
+            var result = await _controller.CreateBookForAuthorWithoutLinks(authorId, book);
+
+            // Assert
+            Assert.IsType<NotFoundObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task CreateBookForAuthorWithoutLinks_AuthorDoExist_MustReturnsCreatedAtRouteResult()
+        {
+            // Arrange
+            Guid authorId = Guid.Parse("f3b858bb-5c40-4982-aca7-08dc2a4fce60");
+
+            BookForCreationDto bookForCreation = new BookForCreationDto();
+            Book book = new Book("test title");
+            BookDto bookDto = new BookDto();
+            bookDto.Id = Guid.NewGuid();
+
+            _mockRepository.Setup(repo => repo.AuthorExistsAsync(authorId)).ReturnsAsync(true);
+
+            _mockMapper.Setup(mapper => mapper.Map<Book>(bookForCreation)).Returns(book);
+            _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(bookDto);
+
+            // Act
+            var result = await _controller.CreateBookForAuthorWithoutLinks(authorId, bookForCreation);
+
+            // Assert
+            var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
+            Assert.Equal(Guid.Parse(createdAtRouteResult.RouteValues["id"] + ""), bookDto.Id);
         }
     }
 }

@@ -45,22 +45,7 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBookWithoutLinks(Guid id, string? fields)
         {
-            if (!_propertyCheckerService.TypeHasProperties<BookDto>(fields))
-            {
-                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
-                    statusCode: 400,
-                    detail: $"Not all requested data shaping fields exist on " +
-                    $"the resource: {fields}"));
-            }
-
-            var book = await _myBookRepository.GetBookAsync(id);
-
-            if (book == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(_mapper.Map<BookDto>(book).ShapeData(fields, _bookShapingRequiredFields));
+            return await GetBookInternal(id, fields, includeLinks: false);
         }
 
         [HttpGet(Name = "GetBookWithLinks")]
@@ -72,6 +57,11 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBookWithLinks(Guid id, string? fields)
         {
+            return await GetBookInternal(id, fields, includeLinks: true);
+        }
+
+        private async Task<ActionResult> GetBookInternal(Guid id, string? fields, bool includeLinks)
+        {
             if (!_propertyCheckerService.TypeHasProperties<BookDto>(fields))
             {
                 return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
@@ -87,12 +77,19 @@ namespace MyBook.Controllers
                 return NotFound();
             }
 
-            var links = CreateLinksForBook(id, book.AuthorId, fields);
+            if (includeLinks)
+            {
+                var links = CreateLinksForBook(id, book.AuthorId, fields);
 
-            var shapedBooks = _mapper.Map<BookDto>(book).ShapeData(fields, _bookShapingRequiredFields) as IDictionary<string, object?>;
-            shapedBooks.Add("links", links);
+                var shapedBooks = _mapper.Map<BookDto>(book).ShapeData(fields, _bookShapingRequiredFields) as IDictionary<string, object?>;
+                shapedBooks.Add("links", links);
 
-            return Ok(shapedBooks);
+                return Ok(shapedBooks);
+            }
+            else
+            {
+                return Ok(_mapper.Map<BookDto>(book).ShapeData(fields, _bookShapingRequiredFields));
+            }
         }
 
         [HttpGet("all", Name = "GetBooks")]
@@ -103,38 +100,7 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBooksWithoutLinks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
-            if (!_propertyMappingService
-            .ValidMappingExistsFor<BookDto, Book>(
-                booksResourceParameters.OrderBy))
-            {
-                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
-                    statusCode: 400,
-                    detail: $"Not all requested ordering fields exist on " +
-                    $"the resource: {booksResourceParameters.OrderBy}"));
-            }
-
-            if (!_propertyCheckerService.TypeHasProperties<BookDto>(booksResourceParameters.Fields))
-            {
-                return BadRequest(_problemDetailsFactory.CreateProblemDetails(HttpContext,
-                    statusCode: 400,
-                    detail: $"Not all requested data shaping fields exist on " +
-                    $"the resource: {booksResourceParameters.Fields}"));
-            }
-
-            var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
-
-            var paginationMetadata = new
-            {
-                totalCount = books.TotalCount,
-                pageSize = books.PageSize,
-                currentPage = books.CurrentPage,
-                totalPages = books.TotalPages
-            };
-
-            Response.Headers.Append("X-Pagination",
-                   JsonSerializer.Serialize(paginationMetadata));
-
-            return Ok(_mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields, _bookShapingRequiredFields));
+            return await GetBooksInternal(booksResourceParameters, includeLinks: false);
         }
 
         [HttpGet("all", Name = "GetBooksWithLinks")]
@@ -145,6 +111,11 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> GetBooksWithLinks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
+            return await GetBooksInternal(booksResourceParameters, includeLinks: true);
+        }
+
+        private async Task<ActionResult> GetBooksInternal(BooksResourceParameters booksResourceParameters, bool includeLinks)
+        {
             if (!_propertyMappingService
             .ValidMappingExistsFor<BookDto, Book>(
                 booksResourceParameters.OrderBy))
@@ -176,28 +147,35 @@ namespace MyBook.Controllers
             Response.Headers.Append("X-Pagination",
                    JsonSerializer.Serialize(paginationMetadata));
 
-            var links = CreateLinksForBooks(booksResourceParameters, books.HasNext, books.HasPrevious);
-
-            var shapedBooks = _mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields, _bookShapingRequiredFields);
-
-            var booksWithLinks = shapedBooks.Select(book =>
+            if (includeLinks)
             {
-                var bookDictionary = book as IDictionary<string, object?>;
+                var links = CreateLinksForBooks(booksResourceParameters, books.HasNext, books.HasPrevious);
 
-                var bookLinks = CreateLinksForBook((Guid)bookDictionary["Id"], (Guid)bookDictionary["AuthorId"], null);
+                var shapedBooks = _mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields, _bookShapingRequiredFields);
 
-                bookDictionary.Add("links", bookLinks);
+                var booksWithLinks = shapedBooks.Select(book =>
+                {
+                    var bookDictionary = book as IDictionary<string, object?>;
 
-                return bookDictionary;
-            });
+                    var bookLinks = CreateLinksForBook((Guid)bookDictionary["Id"], (Guid)bookDictionary["AuthorId"], null);
 
-            var linkedResourcesToReturn = new
+                    bookDictionary.Add("links", bookLinks);
+
+                    return bookDictionary;
+                });
+
+                var linkedResourcesToReturn = new
+                {
+                    value = booksWithLinks,
+                    links = links
+                };
+
+                return Ok(linkedResourcesToReturn);
+            }
+            else
             {
-                value = booksWithLinks,
-                links = links
-            };
-
-            return Ok(linkedResourcesToReturn);
+                return Ok(_mapper.Map<IEnumerable<BookDto>>(books).ShapeData(booksResourceParameters.Fields, _bookShapingRequiredFields));
+            }
         }
 
         [HttpPost(Name = "CreateBookForAuthor")]
@@ -208,21 +186,7 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateBookForAuthorWithoutLinks(Guid authorId, BookForCreationDto book)
         {
-            if (!await _myBookRepository.AuthorExistsAsync(authorId))
-            {
-                return NotFound(book);
-            }
-
-            var bookEntity = _mapper.Map<Book>(book);
-
-            _myBookRepository.AddBook(authorId, bookEntity);
-            await _myBookRepository.SaveAsync();
-
-            var links = CreateLinksForBook(bookEntity.Id, authorId, null);
-
-            var bookDto = _mapper.Map<BookDto>(bookEntity);
-
-            return CreatedAtRoute("GetBook", new { id = bookDto.Id }, bookDto);
+            return await CreateBookForAuthorInternal(authorId, book, includeLinks: false);
         }
 
         [HttpPost(Name = "CreateBookForAuthorWithLinks")]
@@ -232,6 +196,11 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> CreateBookForAuthorWithLinks(Guid authorId, BookForCreationDto book)
+        {
+            return await CreateBookForAuthorInternal(authorId, book, includeLinks: true);
+        }
+
+        private async Task<ActionResult> CreateBookForAuthorInternal(Guid authorId, BookForCreationDto book, bool includeLinks)
         {
             if (!await _myBookRepository.AuthorExistsAsync(authorId))
             {
@@ -243,14 +212,21 @@ namespace MyBook.Controllers
             _myBookRepository.AddBook(authorId, bookEntity);
             await _myBookRepository.SaveAsync();
 
-            var links = CreateLinksForBook(bookEntity.Id, authorId, null);
-
             var bookDto = _mapper.Map<BookDto>(bookEntity);
 
-            var shapedBookWithLinksToReturn = bookDto.ShapeData(null, null) as IDictionary<string, object?>;
-            shapedBookWithLinksToReturn.Add("links", links);
+            if (includeLinks)
+            {
+                var links = CreateLinksForBook(bookEntity.Id, authorId, null);
 
-            return CreatedAtRoute("GetBook", new { id = shapedBookWithLinksToReturn["Id"] }, shapedBookWithLinksToReturn);
+                var shapedBookWithLinksToReturn = bookDto.ShapeData(null, null) as IDictionary<string, object?>;
+                shapedBookWithLinksToReturn.Add("links", links);
+
+                return CreatedAtRoute("GetBook", new { id = shapedBookWithLinksToReturn["Id"] }, shapedBookWithLinksToReturn);
+            }
+            else
+            {
+                return CreatedAtRoute("GetBook", new { id = bookDto.Id }, bookDto);
+            }
         }
 
         [HttpPut]
