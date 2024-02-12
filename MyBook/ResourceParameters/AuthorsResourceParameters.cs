@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace MyBook.API.ResourceParameters
+﻿namespace MyBook.API.ResourceParameters
 {
     public class AuthorsResourceParameters
     {
         const int maxPageSize = 10;
+        public int MaxPageSize { get => maxPageSize; }
 
         public string? FullName { get; set; }
 

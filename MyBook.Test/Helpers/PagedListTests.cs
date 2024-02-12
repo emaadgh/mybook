@@ -1,11 +1,6 @@
 ﻿using MyBook.API.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MyBook.Test
+namespace MyBook.Test.Helpers
 {
     public class PagedListTests
     {
@@ -19,8 +14,6 @@ namespace MyBook.Test
         [Fact]
         public void PagedList_HasPrevious_HasPreviousMustReturnTrue()
         {
-            //Arange 
-
             //Act
             bool hasPrevious = pagedList.HasPrevious;
 
@@ -31,8 +24,6 @@ namespace MyBook.Test
         [Fact]
         public void PagedList_HasNext_HasNextMustReturnTrue()
         {
-            //Arange 
-
             //Act
             bool hasNext = pagedList.HasNext;
 

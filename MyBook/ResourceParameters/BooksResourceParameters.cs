@@ -3,6 +3,7 @@
     public class BooksResourceParameters
     {
         const int maxPageSize = 10;
+        public int MaxPageSize { get => maxPageSize; }
 
         public string? PublisherName { get; set; }
 

@@ -12,7 +12,7 @@ using MyBook.Models;
 using MyBook.Services;
 using System.Dynamic;
 
-namespace MyBook.Test
+namespace MyBook.Test.Controllers
 {
     public class BooksControllerTests
     {
