@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
-}).AddNewtonsoftJson().AddXmlDataContractSerializerFormatters();
+}).AddNewtonsoftJson();
 
 builder.Services.AddDbContext<MyBookDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MyBookDbContextConnection")));
@@ -33,6 +33,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
 
 app.UseHttpsRedirection();
