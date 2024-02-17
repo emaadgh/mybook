@@ -41,7 +41,7 @@ namespace MyBook.API.Helpers
                 var requiredFieldsSplit = requiredFields.Split(',');
                 foreach (var requiredField in requiredFieldsSplit)
                 {
-                    if (!fields.Contains(requiredField))
+                    if(fields.IndexOf(requiredField, StringComparison.OrdinalIgnoreCase) < 0)
                     {
                         fields = fields + "," + requiredField;
                     }
