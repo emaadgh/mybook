@@ -33,6 +33,14 @@ namespace MyBook.Test.Controllers
             _mockProblemDetailsFactory = new Mock<ProblemDetailsFactory>();
 
             _controller = new BooksController(_mockRepository.Object, _mockMapper.Object, _propertyMappingService, _propertyCheckerService, _mockProblemDetailsFactory.Object);
+
+            var httpContext = new DefaultHttpContext();
+            httpContext.Request.Headers.Accept = "application/json";
+
+            _controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = httpContext,
+            };
         }
 
         [Fact]
@@ -47,7 +55,7 @@ namespace MyBook.Test.Controllers
             _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(new BookDto { Id = bookId });
 
             // Act
-            var result = await _controller.GetBookWithoutLinks(bookId, null);
+            var result = await _controller.GetBook(bookId, null);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -63,7 +71,7 @@ namespace MyBook.Test.Controllers
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
             string fields = "InvalidFields";
             // Act
-            var result = await _controller.GetBookWithoutLinks(bookId, fields);
+            var result = await _controller.GetBook(bookId, fields);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -79,7 +87,7 @@ namespace MyBook.Test.Controllers
             _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
 
             // Act
-            var result = await _controller.GetBookWithoutLinks(bookId, null);
+            var result = await _controller.GetBook(bookId, null);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -92,22 +100,10 @@ namespace MyBook.Test.Controllers
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
             booksResourceParameters.OrderBy = "NotAValidParameter";
 
-            var httpResponseHeadersMock = new Mock<IHeaderDictionary>();
-            var httpResponseMock = new Mock<HttpResponse>();
-            httpResponseMock.SetupGet(r => r.Headers).Returns(httpResponseHeadersMock.Object);
-
-            var httpContextMock = new Mock<HttpContext>();
-            httpContextMock.SetupGet(c => c.Response).Returns(httpResponseMock.Object);
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContextMock.Object
-            };
-
             _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
             // Act
-            var result = await _controller.GetBooksWithoutLinks(booksResourceParameters);
+            var result = await _controller.GetBooks(booksResourceParameters);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -120,22 +116,10 @@ namespace MyBook.Test.Controllers
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
             booksResourceParameters.OrderBy = "Title";
 
-            var httpResponseHeadersMock = new Mock<IHeaderDictionary>();
-            var httpResponseMock = new Mock<HttpResponse>();
-            httpResponseMock.SetupGet(r => r.Headers).Returns(httpResponseHeadersMock.Object);
-
-            var httpContextMock = new Mock<HttpContext>();
-            httpContextMock.SetupGet(c => c.Response).Returns(httpResponseMock.Object);
-
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContextMock.Object
-            };
-
             _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
             // Act
-            var result = await _controller.GetBooksWithoutLinks(booksResourceParameters);
+            var result = await _controller.GetBooks(booksResourceParameters);
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -150,7 +134,7 @@ namespace MyBook.Test.Controllers
             BookForCreationDto book = new BookForCreationDto();
 
             // Act
-            var result = await _controller.CreateBookForAuthorWithoutLinks(authorId, book);
+            var result = await _controller.CreateBookForAuthor(authorId, book);
 
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
@@ -173,7 +157,7 @@ namespace MyBook.Test.Controllers
             _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(bookDto);
 
             // Act
-            var result = await _controller.CreateBookForAuthorWithoutLinks(authorId, bookForCreation);
+            var result = await _controller.CreateBookForAuthor(authorId, bookForCreation);
 
             // Assert
             var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);

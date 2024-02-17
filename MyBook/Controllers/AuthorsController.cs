@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using MyBook.API.ActionConstraints;
+using Microsoft.Net.Http.Headers;
 using MyBook.API.Helpers;
 using MyBook.API.Models;
 using MyBook.API.ResourceParameters;
@@ -25,6 +25,18 @@ namespace MyBook.API.Controllers
 
         private readonly string _authorShapingRequiredFields = JsonNamingPolicy.CamelCase.ConvertName(nameof(AuthorDto.Id));
 
+        private readonly string[] ValidHeadersWithoutLink = new[]
+        {
+            "*/*",
+            "application/json",
+            "application/vnd.mybook.author+json"
+        };
+
+        private readonly string[] ValidHeadersWithLink = new[]
+        {
+            "application/vnd.mybook.author.hateoas+json"
+        };
+
         public AuthorsController(IMyBookRepository myBookRepository, IMapper mapper,
             IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService, ProblemDetailsFactory problemDetailsFactory)
         {
@@ -36,27 +48,40 @@ namespace MyBook.API.Controllers
         }
 
         [HttpGet(Name = "GetAuthor")]
-        [ApiExplorerSettings(GroupName = "v1")]
-        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
-        [Produces("application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthorWithoutLinks(Guid id, string? fields)
+        public async Task<ActionResult> GetAuthor(Guid id, string? fields)
         {
-            return await GetAuthorInternal(id, fields, includeLinks: false);
-        }
+            var acceptHeader = Request.Headers.Accept.ToString();
 
-        [HttpGet(Name = "GetAuthorWithLinks")]
-        [ApiExplorerSettings(GroupName = "v2")]
-        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
-        [Produces("application/vnd.mybook.author.hateoas+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthorWithLinks(Guid id, string? fields)
-        {
-            return await GetAuthorInternal(id, fields, includeLinks: true);
+            if (MediaTypeHeaderValue.TryParse(acceptHeader, out var parsedAccept))
+            {
+                if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await GetAuthorInternal(id, fields, includeLinks: false);
+                }
+                else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await GetAuthorInternal(id, fields, includeLinks: true);
+                }
+                else
+                {
+                    var problemDetails = new ProblemDetails
+                    {
+                        Detail = "The Accept header value is not supported. Supported values are: "
+                         + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                        Status = StatusCodes.Status406NotAcceptable
+                    };
+
+                    return BadRequest(problemDetails);
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid Accept header format");
+            }
         }
 
         private async Task<ActionResult> GetAuthorInternal(Guid id, string? fields, bool includeLinks)
@@ -92,25 +117,39 @@ namespace MyBook.API.Controllers
         }
 
         [HttpGet("all", Name = "GetAuthors")]
-        [ApiExplorerSettings(GroupName = "v1")]
-        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
-        [Produces("application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthorsWithoutLinks([FromQuery] AuthorsResourceParameters authorsResourceParameters)
+        public async Task<ActionResult> GetAuthors([FromQuery] AuthorsResourceParameters authorsResourceParameters)
         {
-            return await GetAuthorsInternal(authorsResourceParameters, includeLinks: false);
-        }
+            var acceptHeader = Request.Headers.Accept.ToString();
 
-        [HttpGet("all", Name = "GetAuthorsWithLinks")]
-        [ApiExplorerSettings(GroupName = "v2")]
-        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
-        [Produces("application/vnd.mybook.author.hateoas+json")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> GetAuthorsWithLinks([FromQuery] AuthorsResourceParameters authorsResourceParameters)
-        {
-            return await GetAuthorsInternal(authorsResourceParameters, includeLinks: true);
+            if (MediaTypeHeaderValue.TryParse(acceptHeader, out var parsedAccept))
+            {
+                if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await GetAuthorsInternal(authorsResourceParameters, includeLinks: false);
+                }
+                else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await GetAuthorsInternal(authorsResourceParameters, includeLinks: true);
+                }
+                else
+                {
+                    var problemDetails = new ProblemDetails
+                    {
+                        Detail = "The Accept header value is not supported. Supported values are: "
+                         + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                        Status = StatusCodes.Status406NotAcceptable
+                    };
+
+                    return BadRequest(problemDetails);
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid Accept header format");
+            }
         }
 
         private async Task<ActionResult> GetAuthorsInternal(AuthorsResourceParameters authorsResourceParameters, bool includeLinks)
@@ -180,23 +219,38 @@ namespace MyBook.API.Controllers
         }
 
         [HttpPost(Name = "CreateAuthor")]
-        [ApiExplorerSettings(GroupName = "v1")]
-        [RequestHeaderMatchesMediaType("Accept", "*/*", "application/json", "application/vnd.mybook.author+json")]
-        [Produces("application/json", "application/vnd.mybook.author+json")]
+        [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> CreateAuthorWithoutLinks(AuthorForCreationDto authorForCreationDto)
+        public async Task<ActionResult> CreateAuthor(AuthorForCreationDto authorForCreationDto)
         {
-            return await CreateAuthorInternal(authorForCreationDto, false);
-        }
+            var acceptHeader = Request.Headers.Accept.ToString();
 
-        [HttpPost(Name = "CreateAuthorWithLinks")]
-        [ApiExplorerSettings(GroupName = "v2")]
-        [RequestHeaderMatchesMediaType("Accept", "application/vnd.mybook.author.hateoas+json")]
-        [Produces("application/vnd.mybook.author.hateoas+json")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> CreateAuthorWithLinks(AuthorForCreationDto authorForCreationDto)
-        {
-            return await CreateAuthorInternal(authorForCreationDto, true);
+            if (MediaTypeHeaderValue.TryParse(acceptHeader, out var parsedAccept))
+            {
+                if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await CreateAuthorInternal(authorForCreationDto, false);
+                }
+                else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
+                {
+                    return await CreateAuthorInternal(authorForCreationDto, true);
+                }
+                else
+                {
+                    var problemDetails = new ProblemDetails
+                    {
+                        Detail = "The Accept header value is not supported. Supported values are: "
+                         + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                        Status = StatusCodes.Status406NotAcceptable
+                    };
+
+                    return BadRequest(problemDetails);
+                }
+            }
+            else
+            {
+                return BadRequest("Invalid Accept header format");
+            }
         }
 
         private async Task<ActionResult> CreateAuthorInternal(AuthorForCreationDto authorForCreationDto, bool includeLinks)
