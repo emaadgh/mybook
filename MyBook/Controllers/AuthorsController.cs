@@ -353,14 +353,14 @@ namespace MyBook.API.Controllers
             if (string.IsNullOrWhiteSpace(fields))
             {
                 links.Add(
-                  new(Url.Link("GetAuthorWithLinks", new { id }),
+                  new(Url.Link("GetAuthor", new { id }),
                   "self",
                   "GET"));
             }
             else
             {
                 links.Add(
-                  new(Url.Link("GetAuthorWithLinks", new { id, fields }),
+                  new(Url.Link("GetAuthor", new { id, fields }),
                   "self",
                   "GET"));
             }
@@ -415,7 +415,7 @@ namespace MyBook.API.Controllers
             switch (type)
             {
                 case ResourceUriType.PreviousPage:
-                    return Url.Link("GetAuthorsWithLinks",
+                    return Url.Link("GetAuthors",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
@@ -427,7 +427,7 @@ namespace MyBook.API.Controllers
                             fullName = authorsResourceParameters.FullName
                         });
                 case ResourceUriType.NextPage:
-                    return Url.Link("GetAuthorsWithLinks",
+                    return Url.Link("GetAuthors",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
@@ -440,7 +440,7 @@ namespace MyBook.API.Controllers
                         });
                 case ResourceUriType.Current:
                 default:
-                    return Url.Link("GetAuthorsWithLinks",
+                    return Url.Link("GetAuthors",
                         new
                         {
                             fields = authorsResourceParameters.Fields,
