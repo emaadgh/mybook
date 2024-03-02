@@ -1,6 +1,5 @@
 # MyBook: Simple Book Management Web API
-
-!MyBook Logo
+<img src="https://github.com/emaadgh/mybook/assets/10380342/8c04de39-c177-4dd8-866e-8fa6efd7e98d" width="150" height="150">
 
 **MyBook** is a straightforward **ASP.NET Core Web API** project designed for managing book-related data. Whether you're building a personal library or creating a book catalog for an application, MyBook provides the necessary endpoints to handle book CRUD operations.
 
