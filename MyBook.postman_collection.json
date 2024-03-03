@@ -1,0 +1,880 @@
+{
+	"info": {
+		"_postman_id": "fa53f778-c599-46eb-90c2-750c0e961935",
+		"name": "MyBook",
+		"description": "**MyBook** is a straightforward ASP.NET Core Web API project designed for managing book-related data. Whether you're building a personal library or creating a book catalog for an application, MyBook provides the necessary endpoints to handle book CRUD operations. This collection includes requests for retrieving, creating, updating, and deleting both books and authors, as well as retrieving filtered lists and specific details.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31575166"
+	},
+	"item": [
+		{
+			"name": "Get All Books",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						"all"
+					]
+				},
+				"description": "Retrieve all books available in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Books fields ids",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						"all"
+					]
+				},
+				"description": "Retrieve only the IDs of all books available in the database.\n\n_IDs of books and the ID of their author are included in fields by default._"
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Books from an Author",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/all?authorId=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						"all"
+					],
+					"query": [
+						{
+							"key": "authorId",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						}
+					]
+				},
+				"description": "Retrieve all books written by a specific author."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Books filtered",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/all?PublisherName=Scholastic Inc.&AuthorId=a4848a8c-49ed-45ec-9ef8-ea3761793db4&SearchQuery=Rowling&PageNumber=1&PageSize=3&OrderBy=Title  desc&fields=id, title",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						"all"
+					],
+					"query": [
+						{
+							"key": "PublisherName",
+							"value": "Scholastic Inc."
+						},
+						{
+							"key": "AuthorId",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "SearchQuery",
+							"value": "Rowling"
+						},
+						{
+							"key": "PageNumber",
+							"value": "1"
+						},
+						{
+							"key": "PageSize",
+							"value": "3"
+						},
+						{
+							"key": "OrderBy",
+							"value": "Title  desc"
+						},
+						{
+							"key": "fields",
+							"value": "id, title"
+						}
+					]
+				},
+				"description": "Retrieve books filtered by publisher, author, search query, pagination, ordering, and specific fields."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Books filtered with link",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.book.hateoas+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/Books/all?PublisherName=Scholastic Inc.&AuthorId=a4848a8c-49ed-45ec-9ef8-ea3761793db4&SearchQuery=Rowling&PageNumber=1&PageSize=3&OrderBy=Title  desc&fields=id, title",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						"all"
+					],
+					"query": [
+						{
+							"key": "PublisherName",
+							"value": "Scholastic Inc."
+						},
+						{
+							"key": "AuthorId",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "SearchQuery",
+							"value": "Rowling"
+						},
+						{
+							"key": "PageNumber",
+							"value": "1"
+						},
+						{
+							"key": "PageSize",
+							"value": "3"
+						},
+						{
+							"key": "OrderBy",
+							"value": "Title  desc"
+						},
+						{
+							"key": "fields",
+							"value": "id, title"
+						}
+					]
+				},
+				"description": "Retrieve books filtered by various criteria, including publisher, author, search query, pagination, ordering, and specific fields. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "GetBook",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/?id=4599eef6-d41f-45a7-8c75-c9c9172ea62b",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "4599eef6-d41f-45a7-8c75-c9c9172ea62b"
+						}
+					]
+				},
+				"description": "Retrieve a specific book by its ID."
+			},
+			"response": []
+		},
+		{
+			"name": "GetBook fields id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/?id=d7d654b5-97e9-4b91-a3c3-580ce3fdc73d&fields=id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "d7d654b5-97e9-4b91-a3c3-580ce3fdc73d"
+						},
+						{
+							"key": "fields",
+							"value": "id"
+						}
+					]
+				},
+				"description": "Retrieve only the ID of a specific book.\n\n_ID of book and the ID of it's author are included in fields by default._"
+			},
+			"response": []
+		},
+		{
+			"name": "GetBook with link",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.book.hateoas+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/Books/?id=d7d654b5-97e9-4b91-a3c3-580ce3fdc73d",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "d7d654b5-97e9-4b91-a3c3-580ce3fdc73d"
+						},
+						{
+							"key": "fields",
+							"value": "id",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve a specific book by its ID. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Book",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"Title\" : \"The Hitchhiker's Guide to the Galaxy (Hitchhiker's Guide to the Galaxy  #1)\",\r\n\t\"ISBN\" : \"1400052920\",\r\n\t\"Category\": \"Fiction\",\r\n    \"PublicationDate\":\"1996-01-17T00:00:00\",\r\n    \"Publisher\":\"Fingili Books\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Books/?authorId=d3b05403-79b9-460a-9d5e-a3641fd5a1b2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "authorId",
+							"value": "d3b05403-79b9-460a-9d5e-a3641fd5a1b2"
+						}
+					]
+				},
+				"description": "Create a new book entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Book with link",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.book.hateoas+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"Title\" : \"The Hitchhiker's Guide to the Galaxy (Hitchhiker's Guide to the Galaxy  #1)\",\r\n\t\"ISBN\" : \"1400052920\",\r\n\t\"Category\": \"Fiction\",\r\n    \"PublicationDate\":\"1996-01-17T00:00:00\",\r\n    \"Publisher\":\"Fingili Books\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Books/?authorId=d3b05403-79b9-460a-9d5e-a3641fd5a1b2",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "authorId",
+							"value": "d3b05403-79b9-460a-9d5e-a3641fd5a1b2"
+						}
+					]
+				},
+				"description": "Create a new book entry in the database. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Book",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"title\": \"Harry Potter and the Order of the Phoenix (Harry Potter  #5) updated\",\r\n  \"isbn\": \"439358078\",\r\n  \"description\": \"\",\r\n  \"category\": \"\",\r\n  \"publicationDate\": \"2024-01-22T07:11:57.307Z\",\r\n  \"publisher\": \"Scholastic Inc.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Books/?authorId=a4848a8c-49ed-45ec-9ef8-ea3761793db4&bookId=1a177495-2212-4a00-94cf-8d1e91086f41",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "authorId",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "bookId",
+							"value": "1a177495-2212-4a00-94cf-8d1e91086f41"
+						}
+					]
+				},
+				"description": "Update an existing book entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Partially Update Book",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n      \"op\": \"replace\",\r\n      \"path\": \"/title\",\r\n      \"value\": \"Updated title\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Books/?authorId=a4848a8c-49ed-45ec-9ef8-ea3761793db4&bookId=0d35c02d-11f2-4fad-9b76-e2562538c6fa",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "authorId",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "bookId",
+							"value": "0d35c02d-11f2-4fad-9b76-e2562538c6fa"
+						}
+					]
+				},
+				"description": "Partially update an existing book entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Book",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Books/?bookId=d7d654b5-97e9-4b91-a3c3-580ce3fdc73d",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Books",
+						""
+					],
+					"query": [
+						{
+							"key": "bookId",
+							"value": "d7d654b5-97e9-4b91-a3c3-580ce3fdc73d"
+						}
+					]
+				},
+				"description": "Delete a book entry from the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Author",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						}
+					]
+				},
+				"description": "Retrieve author details by their ID."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Author fields id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4&fields=id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "fields",
+							"value": "id"
+						}
+					]
+				},
+				"description": "Retrieve only the ID of an author."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Author with link",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.author.hateoas+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						},
+						{
+							"key": "fields",
+							"value": "id",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Retrieve author details by their ID. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Authors",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/all",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						"all"
+					]
+				},
+				"description": "Retrieve all authors available in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Authors fields id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/all?fields=id",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						"all"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "id"
+						}
+					]
+				},
+				"description": "Retrieve only the IDs of all authors available in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Authors filtered",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/all?FullName=Stephen King&DateOfBirth=1947-09-21&SearchQuery=&PageNumber=1&PageSize=3&OrderBy=Name desc&fields=id, name",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						"all"
+					],
+					"query": [
+						{
+							"key": "FullName",
+							"value": "Stephen King"
+						},
+						{
+							"key": "DateOfBirth",
+							"value": "1947-09-21"
+						},
+						{
+							"key": "SearchQuery",
+							"value": ""
+						},
+						{
+							"key": "PageNumber",
+							"value": "1"
+						},
+						{
+							"key": "PageSize",
+							"value": "3"
+						},
+						{
+							"key": "OrderBy",
+							"value": "Name desc"
+						},
+						{
+							"key": "fields",
+							"value": "id, name"
+						}
+					]
+				},
+				"description": "Retrieve authors filtered by name, date of birth, search query, pagination, ordering, and specific fields."
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Authors filtered with link",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.author.hateoas+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/Authors/all?FullName=Stephen King&DateOfBirth=1947-09-21&SearchQuery=&PageNumber=1&PageSize=3&OrderBy=Name desc&fields=id, name",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						"all"
+					],
+					"query": [
+						{
+							"key": "FullName",
+							"value": "Stephen King"
+						},
+						{
+							"key": "DateOfBirth",
+							"value": "1947-09-21"
+						},
+						{
+							"key": "SearchQuery",
+							"value": ""
+						},
+						{
+							"key": "PageNumber",
+							"value": "1"
+						},
+						{
+							"key": "PageSize",
+							"value": "3"
+						},
+						{
+							"key": "OrderBy",
+							"value": "Name desc"
+						},
+						{
+							"key": "fields",
+							"value": "id, name"
+						}
+					]
+				},
+				"description": "Retrieve authors filtered by various criteria, including name, date of birth, search query, pagination, ordering, and specific fields. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Author",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"Name\" : \"Patick Stewart\",\r\n\t\"DateOfBirth\":\"1996-01-17T00:00:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Authors/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					]
+				},
+				"description": "Create a new author entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Author with link",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.mybook.author.hateoas+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"Name\" : \"Patick Stewart\",\r\n\t\"DateOfBirth\":\"1996-01-17T00:00:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Authors/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					]
+				},
+				"description": "Create a new author entry in the database. The response includes HATEOAS links for navigation and related actions."
+			},
+			"response": []
+		},
+		{
+			"name": "Update Author",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"Name\" : \"David Stewart\",\r\n\t\"DateOfBirth\":\"1996-01-17T00:00:00\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						}
+					]
+				},
+				"description": "Update an existing author entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Partially Update Author",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n    {\r\n      \"op\": \"replace\",\r\n      \"path\": \"/name\",\r\n      \"value\": \"David Stewart\"\r\n    }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						}
+					]
+				},
+				"description": "Partially update an existing author entry in the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Author",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=a4848a8c-49ed-45ec-9ef8-ea3761793db4",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "a4848a8c-49ed-45ec-9ef8-ea3761793db4"
+						}
+					]
+				},
+				"description": "Delete an author entry from the database."
+			},
+			"response": []
+		},
+		{
+			"name": "GetRoot",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+					]
+				},
+				"description": "Retrieve the root of the API."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://localhost:7144/api",
+			"type": "string"
+		}
+	]
+}
