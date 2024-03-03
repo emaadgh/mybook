@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "fa53f778-c599-46eb-90c2-750c0e961935",
+		"_postman_id": "3f2cc16d-8a73-475c-b67b-3a6ab7d16a40",
 		"name": "MyBook",
 		"description": "**MyBook** is a straightforward ASP.NET Core Web API project designed for managing book-related data. Whether you're building a personal library or creating a book catalog for an application, MyBook provides the necessary endpoints to handle book CRUD operations. This collection includes requests for retrieving, creating, updating, and deleting both books and authors, as well as retrieving filtered lists and specific details.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -32,13 +32,19 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}/Books/all",
+					"raw": "{{base_url}}/Books/all?fields=id",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
 						"Books",
 						"all"
+					],
+					"query": [
+						{
+							"key": "fields",
+							"value": "id"
+						}
 					]
 				},
 				"description": "Retrieve only the IDs of all books available in the database.\n\n_IDs of books and the ID of their author are included in fields by default._"
@@ -838,11 +844,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}",
+					"raw": "{{base_url}}/",
 					"host": [
 						"{{base_url}}"
 					],
 					"path": [
+						""
 					]
 				},
 				"description": "Retrieve the root of the API."
