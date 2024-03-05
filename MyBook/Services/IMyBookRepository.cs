@@ -12,6 +12,7 @@ namespace MyBook.Services
         void UpdateBook(Book book);
         void DeleteBook(Book book);
         Task<bool> AuthorExistsAsync(Guid authorId);
+        Task<bool> BookForAuthorExistsAsync(Guid authorId);
         Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorsResourceParameters);
         Task<Author?> GetAuthorAsync(Guid id);
         void AddAuthor(Author author);

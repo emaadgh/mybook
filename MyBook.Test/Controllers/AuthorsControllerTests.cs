@@ -150,5 +150,23 @@ namespace MyBook.Test.Controllers
             var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
             Assert.Equal(Guid.Parse(createdAtRouteResult.RouteValues["id"] + ""), authorDto.Id);
         }
+
+        [Fact]
+        public async Task DeleteAuthor_AuthorCantBeDeletedCauseHasBooks_MustReturnsConflict()
+        {
+            // Arrange
+            var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+
+            Author author = new Author("test name");
+
+            _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId)).ReturnsAsync(author);
+            _mockRepository.Setup(repo => repo.BookForAuthorExistsAsync(authorId)).ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.DeleteAuthor(authorId);
+
+            // Assert
+            Assert.IsType<ConflictObjectResult>(result);
+        }
     }
 }

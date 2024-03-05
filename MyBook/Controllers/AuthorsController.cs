@@ -340,6 +340,16 @@ namespace MyBook.API.Controllers
                 return NotFound();
             }
 
+            var hasAnyBooks = await _myBookRepository.BookForAuthorExistsAsync(id);
+
+            if (hasAnyBooks)
+            {
+                return Conflict(_problemDetailsFactory.CreateProblemDetails(HttpContext,
+                    statusCode: StatusCodes.Status409Conflict,
+                    detail: $"Cannot delete an author with existing books, " +
+                    $"first delete author's books. Author Id: {id}"));
+            }
+
             _myBookRepository.DeleteAuthor(author);
             await _myBookRepository.SaveAsync();
 

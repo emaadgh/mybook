@@ -91,6 +91,16 @@ namespace MyBook.Services
             return await _dbContext.Authors.AnyAsync(a => a.Id == authorId);
         }
 
+        public async Task<bool> BookForAuthorExistsAsync(Guid authorId)
+        {
+            if (authorId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(authorId));
+            }
+
+            return await _dbContext.Books.AnyAsync(b => b.AuthorId == authorId);
+        }
+
         public void UpdateBook(Book book)
         {
             // not needed for this implementation
