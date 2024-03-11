@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "3f2cc16d-8a73-475c-b67b-3a6ab7d16a40",
+		"_postman_id": "3490cf4d-482b-482b-a52c-ff44f84aa8dc",
 		"name": "MyBook",
 		"description": "**MyBook** is a straightforward ASP.NET Core Web API project designed for managing book-related data. Whether you're building a personal library or creating a book catalog for an application, MyBook provides the necessary endpoints to handle book CRUD operations. This collection includes requests for retrieving, creating, updating, and deleting both books and authors, as well as retrieving filtered lists and specific details.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
@@ -9,6 +9,62 @@
 	"item": [
 		{
 			"name": "Get All Books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Id and AuthorId should be non-empty strings\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('array');",
+							"  ",
+							"  responseData.forEach(function(book) {",
+							"    pm.expect(book.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should be a non-empty string\");",
+							"    pm.expect(book.AuthorId).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AuthorId should be a non-empty string\");",
+							"  });",
+							"});",
+							"",
+							"pm.test(\"Response Content-Type is application/json\", function () {",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
+							"});",
+							"",
+							"pm.test(\"Each book has a valid ISBN format\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    responseData.forEach(function(book) {",
+							"        pm.expect(book.ISBN).to.match(/^\\d{10}$/);",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Title should be a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('array');",
+							"    ",
+							"    responseData.forEach(function(book) {",
+							"        pm.expect(book.Title).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Title should not be empty\");",
+							"    });",
+							"});",
+							"",
+							"pm.test(\"Publisher is not an empty string\", function () {",
+							"  const responseData = pm.response.json();",
+							"  ",
+							"  pm.expect(responseData).to.be.an('array');",
+							"  responseData.forEach(function(book) {",
+							"    pm.expect(book.Publisher).to.exist.and.to.not.equal(\"\");",
+							"  });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -28,6 +84,57 @@
 		},
 		{
 			"name": "Get All Books fields ids",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - Id and AuthorId\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book).to.have.property('Id');\r",
+							"        pm.expect(book).to.have.property('AuthorId');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  responseData.forEach(function(book) {\r",
+							"    pm.expect(book.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"  });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"AuthorId is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('array');\r",
+							"  responseData.forEach(function(book) {\r",
+							"    pm.expect(book.AuthorId).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AuthorId should be a non-empty string\");\r",
+							"  });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Content type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -53,6 +160,52 @@
 		},
 		{
 			"name": "Get All Books from an Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book).to.have.property('Id');\r",
+							"        pm.expect(book).to.have.property('AuthorId');\r",
+							"        pm.expect(book).to.have.property('Title');\r",
+							"        pm.expect(book).to.have.property('ISBN');\r",
+							"        pm.expect(book).to.have.property('PublicationDate');\r",
+							"        pm.expect(book).to.have.property('Publisher');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the Content-Type header is set to application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"ISBN is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book.ISBN).to.match(/^\\d{10}$/);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -78,6 +231,63 @@
 		},
 		{
 			"name": "Get All Books filtered",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - Id, Title, and AuthorId\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book).to.be.an('object');\r",
+							"        pm.expect(book).to.have.property('Id');\r",
+							"        pm.expect(book).to.have.property('Title');\r",
+							"        pm.expect(book).to.have.property('AuthorId');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  responseData.forEach(function(book) {\r",
+							"    pm.expect(book.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should be a non-empty string\");\r",
+							"  });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Title is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book.Title).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Title should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"AuthorId is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    responseData.forEach(function(book) {\r",
+							"        pm.expect(book.AuthorId).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AuthorId should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -127,6 +337,46 @@
 		},
 		{
 			"name": "Get All Books filtered with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response Content-Type is application/vnd.mybook.book.hateoas+json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/vnd.mybook.book.hateoas+json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Value array is present\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.value).to.exist.and.to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Links array is present and contains at least one element\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.links).to.exist.and.to.be.an('array').and.to.have.lengthOf.at.least(1);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -182,6 +432,61 @@
 		},
 		{
 			"name": "GetBook",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.Id).to.exist;\r",
+							"  pm.expect(responseData.AuthorId).to.exist;\r",
+							"  pm.expect(responseData.Title).to.exist;\r",
+							"  pm.expect(responseData.ISBN).to.exist;\r",
+							"  pm.expect(responseData.PublicationDate).to.exist;\r",
+							"  pm.expect(responseData.Publisher).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id and AuthorId must be non-empty strings\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"    pm.expect(responseData.AuthorId).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AuthorId should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"ISBN is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.ISBN).to.match(/^\\d{10}$/);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Description and Category fields are either null or non-empty strings\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Description).to.satisfy((value) => value === null || typeof value === 'string');\r",
+							"    pm.expect(responseData.Category).to.satisfy((value) => value === null || typeof value === 'string');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -207,6 +512,55 @@
 		},
 		{
 			"name": "GetBook fields id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response must have required fields - Id and AuthorId\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData).to.have.property('Id');\r",
+							"  pm.expect(responseData).to.have.property('AuthorId');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"AuthorId is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.AuthorId).to.be.a('string').and.to.have.lengthOf.at.least(1, \"AuthorId should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Ensure that the response contains only the requested fields - Id and AuthorId\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(Object.keys(responseData)).to.eql(['Id', 'AuthorId']);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -236,6 +590,49 @@
 		},
 		{
 			"name": "GetBook with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Content-Type is application/vnd.mybook.book.hateoas+json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/vnd.mybook.book.hateoas+json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.exist;\r",
+							"    pm.expect(responseData.AuthorId).to.exist;\r",
+							"    pm.expect(responseData.Title).to.exist;\r",
+							"    pm.expect(responseData.ISBN).to.exist;\r",
+							"    pm.expect(responseData.PublicationDate).to.exist;\r",
+							"    pm.expect(responseData.Publisher).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Links array is present and contains the expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.links).to.exist;\r",
+							"    pm.expect(responseData.links).to.be.an('array');\r",
+							"    pm.expect(responseData.links.length).to.equal(3);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -272,6 +669,46 @@
 		},
 		{
 			"name": "Create Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"  pm.expect(pm.response.to.have.status(201));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"AuthorId is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.authorId).to.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/, \"AuthorId should be in a valid format\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"ISBN is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.isbn).to.be.a('string').and.to.have.lengthOf.at.least(1, \"ISBN should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Category is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.category).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Category should not be empty\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -306,6 +743,49 @@
 		},
 		{
 			"name": "Create Book with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response Content-Type is application/vnd.mybook.book.hateoas+json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/vnd.mybook.book.hateoas+json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.exist;\r",
+							"    pm.expect(responseData.AuthorId).to.exist;\r",
+							"    pm.expect(responseData.Title).to.exist;\r",
+							"    pm.expect(responseData.ISBN).to.exist;\r",
+							"    pm.expect(responseData.Category).to.exist;\r",
+							"    pm.expect(responseData.PublicationDate).to.exist;\r",
+							"    pm.expect(responseData.Publisher).to.exist;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Links array is present and contains expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.links).to.exist.and.to.be.an('array').with.lengthOf(3);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -346,12 +826,43 @@
 		},
 		{
 			"name": "Update Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Author ID is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.authorId).to.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"ISBN is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.isbn).to.be.a('string').and.to.have.lengthOf.at.least(1, \"ISBN should not be empty\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PUT",
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n  \"title\": \"Harry Potter and the Order of the Phoenix (Harry Potter  #5) updated\",\r\n  \"isbn\": \"439358078\",\r\n  \"description\": \"\",\r\n  \"category\": \"\",\r\n  \"publicationDate\": \"2024-01-22T07:11:57.307Z\",\r\n  \"publisher\": \"Scholastic Inc.\"\r\n}",
+					"raw": "{\r\n  \"title\": \"Harry Potter and the Order of the Phoenix (Harry Potter  #5) updated\",\r\n  \"isbn\": \"0747551006\",\r\n  \"description\": \"\",\r\n  \"category\": \"\",\r\n  \"publicationDate\": \"2024-01-22T07:11:57.307Z\",\r\n  \"publisher\": \"Scholastic Inc.\"\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -384,6 +895,52 @@
 		},
 		{
 			"name": "Partially Update Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.to.have.status(201));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - id, authorId, title, publicationDate\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData).to.have.property('id');\r",
+							"    pm.expect(responseData).to.have.property('authorId');\r",
+							"    pm.expect(responseData).to.have.property('title');\r",
+							"    pm.expect(responseData).to.have.property('publicationDate');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"ISBN is either null or a valid ISBN format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.isbn).to.satisfy((isbn) => {\r",
+							"        return isbn === null || /^\\d{10}$/.test(isbn);\r",
+							"    }, \"ISBN should be either null or a valid ISBN format\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Category field is either null or a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.category).to.satisfy((category) => {\r",
+							"        return category === null || (typeof category === 'string' && category.length > 0);\r",
+							"    }, \"Category field must be either null or a non-empty string\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PATCH",
 				"header": [],
@@ -422,6 +979,36 @@
 		},
 		{
 			"name": "Delete Book",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Verify that the 'bookId' query parameter is present in the request URL\", function () {\r",
+							"    const requestUrl = pm.request.url.toString();\r",
+							"    pm.expect(requestUrl).to.include(\"bookId=\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Ensure that the response does not contain any sensitive information\", function () {\r",
+							"    const responseData = pm.response.text();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -447,6 +1034,48 @@
 		},
 		{
 			"name": "Get Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"pm.test(\"Response status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Response has the required fields - Id, Name, and DateOfBirth\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData).to.have.property('Id');",
+							"    pm.expect(responseData).to.have.property('Name');",
+							"    pm.expect(responseData).to.have.property('DateOfBirth');",
+							"});",
+							"",
+							"",
+							"pm.test(\"Id is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should be a non-empty string\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Name is a non-empty string\", function () {",
+							"    const responseData = pm.response.json();",
+							"    ",
+							"    pm.expect(responseData).to.be.an('object');",
+							"    pm.expect(responseData.Name).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Name should not be empty\");",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -472,6 +1101,49 @@
 		},
 		{
 			"name": "Get Author fields id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required Content-Type header with value application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response body contains the required field 'Id'\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    pm.expect(responseData).to.have.property('Id');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"\r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Id is in a valid format\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.match(/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/, \"Id should be in a valid format\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -501,6 +1173,48 @@
 		},
 		{
 			"name": "Get Author with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.Name).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.DateOfBirth).to.exist.and.to.be.a('string');\r",
+							"    pm.expect(responseData.links).to.exist.and.to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Description is either null or a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  pm.expect(responseData).to.be.an('object');\r",
+							"  pm.expect(responseData.Description).to.satisfy((description) => {\r",
+							"    return description === null || (typeof description === 'string' && description.length > 0);\r",
+							"  }, \"Description should be either null or a non-empty string\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Content-Type header is 'application/vnd.mybook.author.hateoas+json'\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.contains(\"application/vnd.mybook.author.hateoas+json;\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -537,6 +1251,47 @@
 		},
 		{
 			"name": "Get All Authors",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields - Id, Name, and DateOfBirth\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(author) {\r",
+							"        pm.expect(author).to.have.property('Id');\r",
+							"        pm.expect(author).to.have.property('Name');\r",
+							"        pm.expect(author).to.have.property('DateOfBirth');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Description is nullable\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    responseData.forEach(function(author) {\r",
+							"        pm.expect(author.Description).to.be.null;\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type header is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -556,6 +1311,53 @@
 		},
 		{
 			"name": "Get All Authors fields id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response is an array\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  pm.expect(responseData).to.be.an('array');\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Each element in the array has a non-empty 'Id' field\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(author) {\r",
+							"        pm.expect(author.Id).to.exist.and.to.have.lengthOf.at.least(1, \"Id should not be empty\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains only the 'Id' field and no other fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(author) {\r",
+							"        pm.expect(author).to.have.all.keys('Id');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -581,6 +1383,53 @@
 		},
 		{
 			"name": "Get All Authors filtered",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response Content-Type is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response contains an array with at least one element\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Each element in the response array has the required fields - id and name\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"    responseData.forEach(function(author) {\r",
+							"        pm.expect(author).to.have.property('Id').that.is.a('string');\r",
+							"        pm.expect(author).to.have.property('Name').that.is.a('string');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Pagination is working as expected with the specified PageSize and PageNumber\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    pm.expect(responseData).to.have.lengthOf.most(3, \"Page size should at most be 3\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -630,6 +1479,56 @@
 		},
 		{
 			"name": "Get All Authors filtered with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response Content-Type is application/vnd.mybook.author.hateoas+json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/vnd.mybook.author.hateoas+json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Value array should not be empty\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.value).to.be.an('array').that.is.not.empty;\r",
+							"    responseData.value.forEach(function(author) {\r",
+							"        pm.expect(author.Id).to.exist.and.to.not.be.empty;\r",
+							"        pm.expect(author.Name).to.exist.and.to.not.be.empty;\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Links array should contain non-empty elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.links).to.be.an('array').that.is.not.empty;\r",
+							"    responseData.links.forEach(function(link) {\r",
+							"        pm.expect(link).to.be.an('object').that.is.not.empty;\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Each 'value' object has non-empty 'Id' and 'Name' properties\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.value).to.be.an('array');\r",
+							"    responseData.value.forEach(function(author) {\r",
+							"        pm.expect(author.Id).to.exist.and.to.not.be.empty;\r",
+							"        pm.expect(author.Name).to.exist.and.to.not.be.empty;\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [
@@ -685,6 +1584,35 @@
 		},
 		{
 			"name": "Create Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Description is either null or a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.description).to.satisfy((description) => {\r",
+							"        return description === null || (typeof description === 'string' && description.length > 0);\r",
+							"    }, \"Description should be either null or a non-empty string\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Verify Content-Type header is application/json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [],
@@ -713,6 +1641,46 @@
 		},
 		{
 			"name": "Create Author with link",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 201\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(201);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.Id).to.exist;\r",
+							"    pm.expect(responseData.Name).to.exist;\r",
+							"    pm.expect(responseData.Description).to.null;\r",
+							"    pm.expect(responseData.DateOfBirth).to.exist;\r",
+							"    pm.expect(responseData.links).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Content-Type header is application/vnd.mybook.author.hateoas+json\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/vnd.mybook.author.hateoas+json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Links array is present and contains the expected number of elements\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.links).to.exist.and.to.be.an('array').with.lengthOf(3);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -747,6 +1715,29 @@
 		},
 		{
 			"name": "Update Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"    pm.expect(pm.response.text()).to.empty;\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Ensure that the response body is empty\", function () {\r",
+							"    pm.expect(pm.response.text()).to.be.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PUT",
 				"header": [],
@@ -781,6 +1772,26 @@
 		},
 		{
 			"name": "Partially Update Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"    const responseData = pm.response.text();\r",
+							"    \r",
+							"    pm.expect(responseData).to.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "PATCH",
 				"header": [],
@@ -815,6 +1826,93 @@
 		},
 		{
 			"name": "Delete Author",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Response status code is 204\", function () {\r",
+							"  pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response body is empty\", function () {\r",
+							"    const responseData = pm.response.text();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.empty;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/Authors/?id=ad3d0a3d-006d-4a2d-817b-114cf7e22904",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"Authors",
+						""
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "ad3d0a3d-006d-4a2d-817b-114cf7e22904"
+						}
+					]
+				},
+				"description": "Delete an author entry from the database."
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Author with related books",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 409\", function () {\r",
+							"  pm.expect(pm.response.code).to.equal(409);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required fields\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.type).to.exist;\r",
+							"    pm.expect(responseData.title).to.exist;\r",
+							"    pm.expect(responseData.status).to.exist;\r",
+							"    pm.expect(responseData.detail).to.exist;\r",
+							"    pm.expect(responseData.traceId).to.exist;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Title is a non-empty string\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('object');\r",
+							"    pm.expect(responseData.title).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Title should not be empty\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status is a non-negative integer\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData.status).to.be.a('number');\r",
+							"    pm.expect(responseData.status).to.be.at.least(0);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "DELETE",
 				"header": [],
@@ -834,12 +1932,65 @@
 						}
 					]
 				},
-				"description": "Delete an author entry from the database."
+				"description": "Trying to delete an author entry from the database when related books to him exist"
 			},
 			"response": []
 		},
 		{
 			"name": "GetRoot",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"Response status code is 200\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Response has the required Content-Type header with value 'application/json'\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Each object in the array has required fields - href, rel, and method\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array').that.is.not.empty;\r",
+							"\r",
+							"    responseData.forEach(function(item) {\r",
+							"        pm.expect(item).to.have.property('href');\r",
+							"        pm.expect(item).to.have.property('rel');\r",
+							"        pm.expect(item).to.have.property('method');\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Href is a non-empty string\", function () {\r",
+							"  const responseData = pm.response.json();\r",
+							"  \r",
+							"  responseData.forEach(function(item) {\r",
+							"      pm.expect(item.href).to.be.a('string').and.to.have.lengthOf.at.least(1, \"Href should not be empty\");\r",
+							"  });\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Method is a valid HTTP method\", function () {\r",
+							"    const responseData = pm.response.json();\r",
+							"    \r",
+							"    pm.expect(responseData).to.be.an('array');\r",
+							"    responseData.forEach(function(item) {\r",
+							"        pm.expect(item.method).to.be.a('string').and.to.match(/^(GET|POST|PUT|DELETE|PATCH|HEAD|OPTIONS|CONNECT|TRACE)$/);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
