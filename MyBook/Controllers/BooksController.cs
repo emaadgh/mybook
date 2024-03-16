@@ -38,6 +38,9 @@ namespace MyBook.Controllers
             "application/vnd.mybook.book.hateoas+json"
         };
 
+        /// <summary>
+        /// Constructor for BooksController.
+        /// </summary>
         public BooksController(IMyBookRepository myBookRepository, IMapper mapper,
             IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService, ProblemDetailsFactory problemDetailsFactory)
         {
@@ -48,6 +51,12 @@ namespace MyBook.Controllers
             _problemDetailsFactory = problemDetailsFactory;
         }
 
+        /// <summary>
+        /// Get a book by id.
+        /// </summary>
+        /// <param name="id">The id of the book to get.</param>
+        /// <param name="fields">The fields that are needed.</param>
+        /// <returns>An ActionResult containing the requested book.</returns>
         [HttpGet(Name = "GetBook")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -117,6 +126,11 @@ namespace MyBook.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all books.
+        /// </summary>
+        /// <param name="booksResourceParameters">Parameters for filtering, searching, and pagination.</param>
+        /// <returns>An ActionResult containing a list of books.</returns>
         [HttpGet("all", Name = "GetBooks")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -217,6 +231,12 @@ namespace MyBook.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a new book for an author.
+        /// </summary>
+        /// <param name="authorId">The id of the author for whom the book is created.</param>
+        /// <param name="book">The data for creating a new book.</param>
+        /// <returns>An ActionResult containing the created book.</returns>
         [HttpPost(Name = "CreateBookForAuthor")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -282,6 +302,13 @@ namespace MyBook.Controllers
             }
         }
 
+        /// <summary>
+        /// Update an existing book.
+        /// </summary>
+        /// <param name="bookId">The id of the book to update.</param>
+        /// <param name="authorId">The id of the author of the book.</param>
+        /// <param name="book">The data for updating the book.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -316,6 +343,13 @@ namespace MyBook.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Partially update an existing book.
+        /// </summary>
+        /// <param name="bookId">The id of the book to update.</param>
+        /// <param name="authorId">The id of the author of the book.</param>
+        /// <param name="patchDocument">The patch document containing updates.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -370,6 +404,11 @@ namespace MyBook.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Delete a book.
+        /// </summary>
+        /// <param name="bookId">The id of the book to delete.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

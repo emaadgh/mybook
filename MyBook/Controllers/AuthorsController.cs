@@ -13,6 +13,9 @@ using System.Text.Json;
 
 namespace MyBook.API.Controllers
 {
+    /// <summary>
+    /// Controller responsible for handling operations related to authors.
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthorsController : Controller
@@ -37,6 +40,9 @@ namespace MyBook.API.Controllers
             "application/vnd.mybook.author.hateoas+json"
         };
 
+        /// <summary>
+        /// Constructor for AuthorsController.
+        /// </summary>
         public AuthorsController(IMyBookRepository myBookRepository, IMapper mapper,
             IPropertyMappingService propertyMappingService, IPropertyCheckerService propertyCheckerService, ProblemDetailsFactory problemDetailsFactory)
         {
@@ -47,6 +53,12 @@ namespace MyBook.API.Controllers
             _problemDetailsFactory = problemDetailsFactory;
         }
 
+        /// <summary>
+        /// Get an author by id
+        /// </summary>
+        /// <param name="id"> The id of the author to get</param>
+        /// <param name="fields"> The fields that are needed</param>
+        /// <returns>An ActionResult containing the requested author.</returns>
         [HttpGet(Name = "GetAuthor")]
         [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -116,6 +128,11 @@ namespace MyBook.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Get all authors.
+        /// </summary>
+        /// <param name="authorsResourceParameters">Parameters for filtering, searching, and pagination.</param>
+        /// <returns>An ActionResult containing a list of authors.</returns>
         [HttpGet("all", Name = "GetAuthors")]
         [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -218,6 +235,11 @@ namespace MyBook.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Create a new author.
+        /// </summary>
+        /// <param name="authorForCreationDto">The data for creating a new author.</param>
+        /// <returns>An ActionResult containing the created author.</returns>
         [HttpPost(Name = "CreateAuthor")]
         [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -277,6 +299,12 @@ namespace MyBook.API.Controllers
             }
         }
 
+        /// <summary>
+        /// Update an existing author.
+        /// </summary>
+        /// <param name="id">The id of the author to update.</param>
+        /// <param name="authorForUpdateDto">The data for updating the author.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -298,6 +326,12 @@ namespace MyBook.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Partially update an existing author.
+        /// </summary>
+        /// <param name="id">The id of the author to update.</param>
+        /// <param name="patchDocument">The patch document containing updates.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -328,6 +362,11 @@ namespace MyBook.API.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Delete an author.
+        /// </summary>
+        /// <param name="id">The id of the author to delete.</param>
+        /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
