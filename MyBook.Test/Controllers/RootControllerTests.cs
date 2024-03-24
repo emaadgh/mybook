@@ -54,7 +54,7 @@ namespace MyBook.Test.Controllers
             Assert.Equal(4, links.Count);
         }
 
-        private static Mock<IUrlHelper> CreateMockUrlHelper(ActionContext context = null)
+        private static Mock<IUrlHelper> CreateMockUrlHelper(ActionContext context)
         {
             if (context == null)
             {
@@ -73,7 +73,7 @@ namespace MyBook.Test.Controllers
             {
                 ActionDescriptor = new ActionDescriptor
                 {
-                    RouteValues = new Dictionary<string, string>
+                    RouteValues = new Dictionary<string, string?>
                     {
                         { "page", page },
                     },

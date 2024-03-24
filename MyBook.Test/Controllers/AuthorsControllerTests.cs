@@ -148,7 +148,7 @@ namespace MyBook.Test.Controllers
 
             // Assert
             var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
-            Assert.Equal(Guid.Parse(createdAtRouteResult.RouteValues["id"] + ""), authorDto.Id);
+            Assert.Equal(Guid.Parse($"{createdAtRouteResult.RouteValues?["id"]}"), authorDto.Id);
         }
 
         [Fact]

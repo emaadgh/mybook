@@ -49,7 +49,7 @@ namespace MyBook.Test.Helpers
         public void ApplySort_NullSource_MustThrowsArgumentNullException()
         {
             // Arrange
-            IQueryable<TestEntity>? source = null;
+            IQueryable<TestEntity>? source = null!;
             var mappingDictionary = new Dictionary<string, PropertyMappingValue>();
 
             // Act & Assert
@@ -61,7 +61,7 @@ namespace MyBook.Test.Helpers
         {
             // Arrange
             var source = new List<TestEntity>().AsQueryable();
-            Dictionary<string, PropertyMappingValue>? mappingDictionary = null;
+            Dictionary<string, PropertyMappingValue>? mappingDictionary = null!;
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => source.ApplySort("Name", mappingDictionary));
