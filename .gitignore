@@ -7,8 +7,12 @@
 
 #AppSetting files
 MyBook/appsettings.Development.json
+MyBook/appsettings.Production.json
 MyBook/appsettings.json
 MyBook/appsettings.Staging.json
+
+#Environment Variables
+*.env
 
 # User-specific files
 *.suo
