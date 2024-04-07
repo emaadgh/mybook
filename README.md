@@ -3,28 +3,6 @@
 
 **MyBook** is a straightforward **ASP.NET Core Web API** project designed for managing book-related data. Whether you're building a personal library or creating a book catalog for an application, MyBook provides the necessary endpoints to handle book CRUD operations.
 
-## API Endpoints
-
-The MyBook API provides the following endpoints:
-
-### Authors
-
-- **GET /api/Authors**: Retrieves an author by ID. Optional query parameters include `id` and `fields`.
-- **POST /api/Authors**: Creates a new author. The request body should include the author details.
-- **PUT /api/Authors**: Updates an existing author. The request body should include the updated author details.
-- **PATCH /api/Authors**: Partially updates an author. The request body should include the fields to update and their new values.
-- **DELETE /api/Authors**: Deletes an author by ID.
-
-### Books
-
-- **GET /api/Books**: Retrieves a book by ID. Optional query parameters include `id` and `fields`.
-- **POST /api/Books**: Creates a new book for an author. The request body should include the book details.
-- **PUT /api/Books**: Updates an existing book. The request body should include the updated book details.
-- **PATCH /api/Books**: Partially updates a book. The request body should include the fields to update and their new values.
-- **DELETE /api/Books**: Deletes a book by ID.
-
-For more details about the request and response formats, please refer to the Swagger documentation.
-
 ## Getting Started
 
 1. **Clone the Repository**:
@@ -33,7 +11,7 @@ For more details about the request and response formats, please refer to the Swa
     ```
 
 2. **Install Dependencies**:
-    - Ensure you have **.NET SDK** installed.
+    - Ensure you have **.NET SDK 8** installed.
     - Open a terminal and navigate to the project folder:
         ```bash
         cd mybook
@@ -43,16 +21,172 @@ For more details about the request and response formats, please refer to the Swa
         dotnet restore
         ```
 
+    **Dependencies** (for MyBook API project):
+    - AutoMapper.Extensions.Microsoft.DependencyInjection (v12.0.1)
+    - Microsoft.AspNetCore.JsonPatch (v8.0.1)
+    - Microsoft.AspNetCore.Mvc.NewtonsoftJson (v8.0.1)
+    - Microsoft.EntityFrameworkCore.SqlServer (v8.0.1)
+    - Microsoft.EntityFrameworkCore.Tools (v8.0.1)
+    - Microsoft.VisualStudio.Azure.Containers.Tools.Targets (v1.19.5)
+    - Swashbuckle.AspNetCore (v6.4.0)
+    - System.Linq.Dynamic.Core (v1.3.8)
+
+    **Dependencies** (for MyBook Test project):
+    - Microsoft.NET.Test.Sdk (v17.8.0)
+    - Moq (v4.20.70)
+    - xunit (v2.6.6)
+    - xunit.runner.visualstudio (v2.5.6)
+    - coverlet.collector (v6.0.0)
+
 3. **Run the Application**:
-    - Start the API:
+    - Start the API by running the following command in your terminal:
         ```bash
         dotnet run
         ```
-    - The API will be available at `https://localhost:5001/api/books`.
+4. **Database Migration**:
+    - After building the project, run the following command to create or update the database based on migration files:
+        ```bash
+        dotnet ef database update
+        ```
+        If you don't have the Entity Framework Core tools (`dotnet ef`) installed globally, you can install them by running the following command:
+        ```bash
+        dotnet tool install --global dotnet-ef
+        ```
 
-4. **Explore the API**:
-    - Use tools like **Swagger** or **Postman** to interact with the endpoints.
-    - Visit the Swagger UI at `https://localhost:5001/swagger/index.html`.
+5. **Access the API**:
+    - By default, the API will be hosted on `localhost` with a randomly assigned port. You can access the API using the following URL format:
+        ```
+        https://localhost:<PORT>/api
+        ```
+    - Replace `<PORT>` with the port number assigned to the API during startup.
+
+6. **Explore the API**:
+    - Once the API is running, you can use tools like **Swagger** or **Postman** to interact with the endpoints.
+    - Visit the Swagger UI at `https://localhost:<PORT>/swagger/index.html` to explore the API documentation interactively.
+  
+## Exploring the API with Postman
+
+1. **Import Postman Collection**:
+    - Locate the `MyBook.postman_collection.json` file in the project repository.
+    - Import this collection into Postman using the following steps:
+        - Open Postman.
+        - Click on the "Import" button in the top left corner.
+        - Select the option to "Import From File" and choose the `MyBook.postman_collection.json` file.
+        - Click "Import" to add the collection to your Postman workspace.
+
+2. **Set Base URL**:
+    - Once the collection is imported, navigate to the collection settings in Postman.
+    - In the "Variables" section, locate the variable named `base_url`.
+    - Set the value of this variable to the base URL of your API. You can specify the URL and port here, e.g., `https://localhost:5001`.
+    - This base URL will be automatically used for all requests within the collection.
+
+3. **Explore Endpoints**:
+    - Now you can explore and interact with the API endpoints conveniently using the imported Postman collection.
+    - Each request in the collection will utilize the base URL configured in the variables, making it easy to test different endpoints with your local setup
+      
+4. **Written Tests**:
+    - The Postman collection includes written tests for various requests to validate their responses.
+    - These tests ensure that the responses meet expected criteria, such as status codes, data types, and content format.
+    - You can run these tests within Postman to verify the correctness of API responses.
+  
+## AppSettings.json Configuration
+
+Please note that `appsettings.json` files are not included in the Git repository. These files typically contain sensitive information such as database connection strings, API keys, and other configuration settings specific to the environment.
+
+For local testing, you can create your own `appsettings.json` file in the root directory of the MyBook project and add the necessary configurations. Make sure to include the `MyBookDbContextConnection` connection string for the SQL Server database if you're using one locally.
+
+If you deploy the MyBook API to Azure App Service, you can add the connection string in the Connection Strings section of the Configuration settings in the Azure portal. Azure App Service securely encrypts connection strings at rest and transmits them over an encrypted channel, ensuring the security of your sensitive information.
+
+## CI/CD Pipeline
+
+This repository includes a CI/CD pipeline that automates the build, test, and deployment processes for the MyBook project.
+
+### Pipeline Configuration
+
+The repository contains a configuration file named `azure-pipeline.yml` which defines the CI/CD pipeline. This file can be used with Microsoft Azure DevOps's Pipeline service.
+
+The pipeline configuration orchestrates the following tasks:
+- Dependency restoration
+- Building the project
+- Running tests
+- Publishing artifacts for deployment
+
+### Usage
+
+The CI/CD pipeline ensures that changes to the project are automatically validated, built, and prepared for deployment, streamlining the development process and maintaining code quality.
+
+In addition, we utilize Azure DevOps Pipeline Releases to continuously deploy artifacts from the CI pipeline to an Azure app service in the cloud. This allows for seamless and automated deployment of updates to the application environment.
+
+<img src="https://github.com/emaadgh/mybook/assets/10380342/bd11d934-e762-4ceb-88cc-0013123dba03" width="589.5" height="314">
+
+Users can leverage this pipeline configuration in Microsoft Azure DevOps's Pipeline service to automate the software delivery process.
+
+## Dockerizing the API with Dockerfile and Docker Compose
+
+The MyBook API can be easily containerized using DockerFile along with Docker Compose to orchestrate multiple containers. Docker provides a consistent environment across different systems, making it easier to deploy and manage applications.
+
+To Dockerize the MyBook API and run it with Docker Compose, follow these steps:
+
+1. Ensure you have Docker installed on your system.
+2. Navigate to the root directory of the MyBook project.
+3. Create a `.env` file beside the `docker-compose.yml` file.
+4. Add the following environment variable to the `.env` file:
+```
+SA_PASSWORD=preferedpassword
+```
+Replace `preferedpassword` with your preferred SQL Server SA password.
+
+5. Run the following command in the terminal to start the containers:
+```
+docker-compose up
+```
+This will build the MyBook API Docker image and start the containers for the API and the SQL Server database.
+
+With Docker and Docker Compose, you can easily deploy and manage the MyBook API in a containerized environment, ensuring consistency and scalability across different systems.
+
+## Deployed Version on Azure App Service and Azure API Management
+
+The MyBook API is deployed on **Azure App Service** and is accessible through **Azure API Management** service. This deployment setup provides scalability, reliability, and additional features such as rate limiting and response caching for GET operations.
+
+To access the deployed API and test its functionality, you can request access from its **Developer Portal** ([here](https://mybook-apim-developer.developer.azure-api.net)). Through the developer portal, you can explore the API documentation, access endpoints, and test functionality in a controlled environment.
+
+This version of the API is continuously updated using the CI/CD pipeline described earlier. This ensures that the API remains up-to-date with the latest changes and improvements, providing users with the most current features and enhancements.
+
+You can access the API directly at https://mybook-apim-developer.azure-api.net/mybook/api. Please note that even for direct access to the API, you still need to request access from the developer portal and gain a valid Ocp-Apim-Subscription-Key.
+
+## MyBook Test Project
+
+The `mybook.test` project contains unit tests that validate the behavior of various components within the MyBook API. These unit tests cover Controllers, Helper classes, AutoMapper Profiles, ResourceParameters, and Services used in the project.
+
+These tests are crucial for ensuring the correctness and reliability of the MyBook API. They are automatically executed as part of the CI/CD pipeline to maintain code quality and identify any regressions that may occur during development.
+
+## Database Reset for Testing Purposes
+
+For testing purposes, you can add the following code snippet to your `Program.cs` file. This code will reset the database and its data every time the application is run:
+
+```
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetService<MyBookDbContext>();
+        if (context != null)
+        {
+            await context.Database.EnsureDeletedAsync();
+            await context.Database.MigrateAsync();
+        }
+    }
+    catch (Exception ex)
+    {
+        // Handle any exceptions if necessary
+    }
+}
+```
+Make sure to replace `MyBookDbContext` with your actual DbContext class if it's named differently.
+
+## Creator
+
+- [Emaad Ghorbani](https://github.com/emaadgh)
 
 ## Contributing
 
