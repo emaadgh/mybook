@@ -144,16 +144,6 @@ This will build the MyBook API Docker image and start the containers for the API
 
 With Docker and Docker Compose, you can easily deploy and manage the MyBook API in a containerized environment, ensuring consistency and scalability across different systems.
 
-## Deployed Version on Azure App Service and Azure API Management
-
-The MyBook API is deployed on **Azure App Service** and is accessible through **Azure API Management** service. This deployment setup provides scalability, reliability, and additional features such as rate limiting and response caching for GET operations.
-
-To access the deployed API and test its functionality, you can request access from its **Developer Portal** ([here](https://mybook-apim-developer.developer.azure-api.net)). Through the developer portal, you can explore the API documentation, access endpoints, and test functionality in a controlled environment.
-
-This version of the API is continuously updated using the CI/CD pipeline described earlier. This ensures that the API remains up-to-date with the latest changes and improvements, providing users with the most current features and enhancements.
-
-You can access the API directly at https://mybook-apim-developer.azure-api.net/mybook/api. Please note that even for direct access to the API, you still need to request access from the developer portal and gain a valid Ocp-Apim-Subscription-Key.
-
 ## MyBook Test Project
 
 The `mybook.test` project contains unit tests that validate the behavior of various components within the MyBook API. These unit tests cover Controllers, Helper classes, AutoMapper Profiles, ResourceParameters, and Services used in the project.
