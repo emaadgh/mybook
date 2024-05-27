@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Net.Http.Headers;
 using MyBook.API.Helpers;
 using MyBook.API.Models;
@@ -15,6 +16,7 @@ using System.Text.Json;
 namespace MyBook.Controllers
 {
     [Route("api/[controller]")]
+    [EnableRateLimiting("GlobalRateLimit")]
     [ApiController]
     public class BooksController : ControllerBase
     {
@@ -62,6 +64,7 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<ActionResult> GetBook(Guid id, string? fields)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
@@ -135,6 +138,7 @@ namespace MyBook.Controllers
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
         {
             var acceptHeader = Request.Headers.Accept.ToString();

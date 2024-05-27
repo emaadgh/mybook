@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using MyBook.API.Models;
 
 namespace MyBook.API.Controllers
@@ -15,6 +16,9 @@ namespace MyBook.API.Controllers
         /// </summary>
         /// <returns>An IActionResult containing links to different API endpoints.</returns> 
         [HttpGet(Name = "GetRoot")]
+        [EnableRateLimiting("GlobalRateLimit")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public IActionResult GetRoot()
         {
             var links = new List<LinkDto>

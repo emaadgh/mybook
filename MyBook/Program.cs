@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using MyBook.API.Services;
 using MyBook.DbContexts;
 using MyBook.Services;
+using System.Globalization;
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,8 +16,12 @@ builder.Services.AddControllers(options =>
     options.ReturnHttpNotAcceptable = true;
 }).AddNewtonsoftJson();
 
+builder.Services.Configure<AppSettings>(builder.Configuration);
+var settings = builder.Configuration.Get<AppSettings>();
+ArgumentNullException.ThrowIfNull(settings, nameof(settings));
+
 builder.Services.AddDbContext<MyBookDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MyBookDbContextConnection")));
+    options.UseSqlServer(settings.ConnectionStrings.MyBookDbContextConnection));
 
 builder.Services.AddTransient<IPropertyMappingService, PropertyMappingService>();
 builder.Services.AddTransient<IPropertyCheckerService, PropertyCheckerService>();
@@ -32,6 +39,29 @@ builder.Services.AddSwaggerGen(setupAction =>
 });
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddRateLimiter(_ =>
+{
+    _.AddFixedWindowLimiter(policyName: settings.GlobalLimitOptions.RateLimitName, options =>
+    {
+        options.PermitLimit = settings.GlobalLimitOptions.PermitLimit;
+        options.Window = TimeSpan.FromSeconds(settings.GlobalLimitOptions.Window);
+        options.QueueLimit = settings.GlobalLimitOptions.QueueLimit;
+    });
+    _.OnRejected = (context, _) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+        {
+            context.HttpContext.Response.Headers.RetryAfter =
+                ((int)retryAfter.TotalSeconds).ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        context.HttpContext.Response.StatusCode = StatusCodes.Status429TooManyRequests;
+        context.HttpContext.Response.WriteAsync("Too many requests. Please try again later.", cancellationToken: _);
+
+        return new ValueTask();
+    };
+});
 
 var app = builder.Build();
 
@@ -57,6 +87,8 @@ else
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

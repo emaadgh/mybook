@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Net.Http.Headers;
 using MyBook.API.Helpers;
 using MyBook.API.Models;
@@ -17,6 +18,7 @@ namespace MyBook.API.Controllers
     /// Controller responsible for handling operations related to authors.
     /// </summary>
     [ApiController]
+    [EnableRateLimiting("GlobalRateLimit")]
     [Route("api/[controller]")]
     public class AuthorsController : Controller
     {
@@ -64,6 +66,7 @@ namespace MyBook.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<ActionResult> GetAuthor(Guid id, string? fields)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
@@ -137,6 +140,7 @@ namespace MyBook.API.Controllers
         [Produces("application/json", "application/vnd.mybook.author+json", "application/vnd.mybook.author.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
         public async Task<ActionResult> GetAuthors([FromQuery] AuthorsResourceParameters authorsResourceParameters)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
