@@ -2,7 +2,7 @@
 
 namespace MyBook.API.Helpers
 {
-    public class PagedList <T> : List<T>
+    public class PagedList<T> : List<T>
     {
         public int CurrentPage { get; private set; }
         public int TotalPages { get; private set; }
@@ -21,11 +21,11 @@ namespace MyBook.API.Helpers
         }
 
         public static async Task<PagedList<T>> CreateAsync(
-            IQueryable<T> source, int pageNumber, int pageSize)
+            IQueryable<T> source, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
         {
             var count = source.Count();
             var items = await source.Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize).ToListAsync();
+                .Take(pageSize).ToListAsync(cancellationToken);
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
     }

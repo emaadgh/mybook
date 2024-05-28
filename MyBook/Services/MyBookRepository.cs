@@ -21,12 +21,12 @@ namespace MyBook.Services
             _propertyMappingService = propertyMappingService ?? throw new ArgumentNullException(nameof(propertyMappingService));
         }
 
-        public async Task<Book?> GetBookAsync(Guid id)
+        public async Task<Book?> GetBookAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Books.Where(b => b.Id == id).FirstOrDefaultAsync();
+            return await _dbContext.Books.Where(b => b.Id == id).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task<PagedList<Book>> GetBooksAsync(BooksResourceParameters booksResourceParameters)
+        public async Task<PagedList<Book>> GetBooksAsync(BooksResourceParameters booksResourceParameters, CancellationToken cancellationToken = default)
         {
             if (booksResourceParameters == null)
             {
@@ -62,7 +62,7 @@ namespace MyBook.Services
             }
 
             return await PagedList<Book>.CreateAsync(collection,
-                booksResourceParameters.PageNumber, booksResourceParameters.PageSize);
+                booksResourceParameters.PageNumber, booksResourceParameters.PageSize, cancellationToken);
         }
 
         public void AddBook(Guid authorId, Book book)
@@ -81,24 +81,24 @@ namespace MyBook.Services
             _dbContext.Books.Add(book);
         }
 
-        public async Task<bool> AuthorExistsAsync(Guid authorId)
+        public async Task<bool> AuthorExistsAsync(Guid authorId, CancellationToken cancellationToken = default)
         {
             if (authorId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            return await _dbContext.Authors.AnyAsync(a => a.Id == authorId);
+            return await _dbContext.Authors.AnyAsync(a => a.Id == authorId, cancellationToken);
         }
 
-        public async Task<bool> BookForAuthorExistsAsync(Guid authorId)
+        public async Task<bool> BookForAuthorExistsAsync(Guid authorId, CancellationToken cancellationToken = default)
         {
             if (authorId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(authorId));
             }
 
-            return await _dbContext.Books.AnyAsync(b => b.AuthorId == authorId);
+            return await _dbContext.Books.AnyAsync(b => b.AuthorId == authorId, cancellationToken);
         }
 
         public void UpdateBook(Book book)
@@ -111,7 +111,7 @@ namespace MyBook.Services
             _dbContext.Books.Remove(book);
         }
 
-        public async Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorsResourceParameters)
+        public async Task<PagedList<Author>> GetAuthorsAsync(AuthorsResourceParameters authorsResourceParameters, CancellationToken cancellationToken = default)
         {
             if (authorsResourceParameters == null)
             {
@@ -146,12 +146,12 @@ namespace MyBook.Services
             }
 
             return await PagedList<Author>.CreateAsync(collection,
-                authorsResourceParameters.PageNumber, authorsResourceParameters.PageSize);
+                authorsResourceParameters.PageNumber, authorsResourceParameters.PageSize, cancellationToken);
         }
 
-        public async Task<Author?> GetAuthorAsync(Guid id)
+        public async Task<Author?> GetAuthorAsync(Guid id, CancellationToken cancellationToken = default)
         {
-            return await _dbContext.Authors.Where(a => a.Id == id).FirstOrDefaultAsync();
+            return await _dbContext.Authors.Where(a => a.Id == id).FirstOrDefaultAsync(cancellationToken);
         }
 
         public void AddAuthor(Author author)
@@ -173,9 +173,9 @@ namespace MyBook.Services
         {
             _dbContext.Authors.Remove(author);
         }
-        public async Task<bool> SaveAsync()
+        public async Task<bool> SaveAsync(CancellationToken cancellationToken = default)
         {
-            return (await _dbContext.SaveChangesAsync() > 0);
+            return (await _dbContext.SaveChangesAsync(cancellationToken) > 0);
         }
     }
 }

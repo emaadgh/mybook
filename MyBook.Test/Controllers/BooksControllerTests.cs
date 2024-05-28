@@ -51,11 +51,13 @@ namespace MyBook.Test.Controllers
             var book = new Book("Book1");
             book.Id = bookId;
 
-            _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            _mockRepository.Setup(repo => repo.GetBookAsync(bookId, cancellationToken)).ReturnsAsync(book);
             _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(new BookDto { Id = bookId });
 
             // Act
-            var result = await _controller.GetBook(bookId, null);
+            var result = await _controller.GetBook(bookId, null, cancellationToken);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -70,8 +72,11 @@ namespace MyBook.Test.Controllers
             // Arrange
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
             string fields = "InvalidFields";
+
+            CancellationToken cancellationToken = CancellationToken.None;
+
             // Act
-            var result = await _controller.GetBook(bookId, fields);
+            var result = await _controller.GetBook(bookId, fields, cancellationToken);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -84,10 +89,12 @@ namespace MyBook.Test.Controllers
             var bookId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
             Book? book = null;
 
-            _mockRepository.Setup(repo => repo.GetBookAsync(bookId)).ReturnsAsync(book);
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            _mockRepository.Setup(repo => repo.GetBookAsync(bookId, cancellationToken)).ReturnsAsync(book);
 
             // Act
-            var result = await _controller.GetBook(bookId, null);
+            var result = await _controller.GetBook(bookId, null, cancellationToken);
 
             // Assert
             Assert.IsType<NotFoundResult>(result);
@@ -100,10 +107,12 @@ namespace MyBook.Test.Controllers
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
             booksResourceParameters.OrderBy = "NotAValidParameter";
 
-            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
             // Act
-            var result = await _controller.GetBooks(booksResourceParameters);
+            var result = await _controller.GetBooks(booksResourceParameters, cancellationToken);
 
             // Assert
             Assert.IsType<BadRequestObjectResult>(result);
@@ -116,10 +125,12 @@ namespace MyBook.Test.Controllers
             BooksResourceParameters booksResourceParameters = new BooksResourceParameters();
             booksResourceParameters.OrderBy = "Title";
 
-            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            _mockRepository.Setup(repo => repo.GetBooksAsync(booksResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Book>(new List<Book>(), 0, 0, 4));
 
             // Act
-            var result = await _controller.GetBooks(booksResourceParameters);
+            var result = await _controller.GetBooks(booksResourceParameters, cancellationToken);
 
             // Assert
             Assert.IsType<OkObjectResult>(result);
@@ -133,8 +144,10 @@ namespace MyBook.Test.Controllers
 
             BookForCreationDto book = new BookForCreationDto();
 
+            CancellationToken cancellationToken = CancellationToken.None;
+
             // Act
-            var result = await _controller.CreateBookForAuthor(authorId, book);
+            var result = await _controller.CreateBookForAuthor(authorId, book, cancellationToken);
 
             // Assert
             Assert.IsType<NotFoundObjectResult>(result);
@@ -151,13 +164,15 @@ namespace MyBook.Test.Controllers
             BookDto bookDto = new BookDto();
             bookDto.Id = Guid.NewGuid();
 
-            _mockRepository.Setup(repo => repo.AuthorExistsAsync(authorId)).ReturnsAsync(true);
+            CancellationToken cancellationToken = CancellationToken.None;
+
+            _mockRepository.Setup(repo => repo.AuthorExistsAsync(authorId, cancellationToken)).ReturnsAsync(true);
 
             _mockMapper.Setup(mapper => mapper.Map<Book>(bookForCreation)).Returns(book);
             _mockMapper.Setup(mapper => mapper.Map<BookDto>(book)).Returns(bookDto);
 
             // Act
-            var result = await _controller.CreateBookForAuthor(authorId, bookForCreation);
+            var result = await _controller.CreateBookForAuthor(authorId, bookForCreation, cancellationToken);
 
             // Assert
             var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);

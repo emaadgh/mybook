@@ -14,49 +14,55 @@
             Constructor for AuthorsController.
             </summary>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.GetAuthor(System.Guid,System.String)">
+        <member name="M:MyBook.API.Controllers.AuthorsController.GetAuthor(System.Guid,System.String,System.Threading.CancellationToken)">
             <summary>
             Get an author by id
             </summary>
             <param name="id"> The id of the author to get</param>
             <param name="fields"> The fields that are needed</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing the requested author.</returns>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.GetAuthors(MyBook.API.ResourceParameters.AuthorsResourceParameters)">
+        <member name="M:MyBook.API.Controllers.AuthorsController.GetAuthors(MyBook.API.ResourceParameters.AuthorsResourceParameters,System.Threading.CancellationToken)">
             <summary>
             Get all authors.
             </summary>
             <param name="authorsResourceParameters">Parameters for filtering, searching, and pagination.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing a list of authors.</returns>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.CreateAuthor(MyBook.API.Models.AuthorForCreationDto)">
+        <member name="M:MyBook.API.Controllers.AuthorsController.CreateAuthor(MyBook.API.Models.AuthorForCreationDto,System.Threading.CancellationToken)">
             <summary>
             Create a new author.
             </summary>
             <param name="authorForCreationDto">The data for creating a new author.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing the created author.</returns>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.UpdateAuthor(System.Guid,MyBook.API.Models.AuthorForUpdateDto)">
+        <member name="M:MyBook.API.Controllers.AuthorsController.UpdateAuthor(System.Guid,MyBook.API.Models.AuthorForUpdateDto,System.Threading.CancellationToken)">
             <summary>
             Update an existing author.
             </summary>
             <param name="id">The id of the author to update.</param>
             <param name="authorForUpdateDto">The data for updating the author.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.PartiallyUpdateAuthor(System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{MyBook.API.Models.AuthorForUpdateDto})">
+        <member name="M:MyBook.API.Controllers.AuthorsController.PartiallyUpdateAuthor(System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{MyBook.API.Models.AuthorForUpdateDto},System.Threading.CancellationToken)">
             <summary>
             Partially update an existing author.
             </summary>
             <param name="id">The id of the author to update.</param>
             <param name="patchDocument">The patch document containing updates.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
-        <member name="M:MyBook.API.Controllers.AuthorsController.DeleteAuthor(System.Guid)">
+        <member name="M:MyBook.API.Controllers.AuthorsController.DeleteAuthor(System.Guid,System.Threading.CancellationToken)">
             <summary>
             Delete an author.
             </summary>
             <param name="id">The id of the author to delete.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
         <member name="T:MyBook.API.Controllers.RootController">
@@ -202,52 +208,58 @@
             Constructor for BooksController.
             </summary>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.GetBook(System.Guid,System.String)">
+        <member name="M:MyBook.Controllers.BooksController.GetBook(System.Guid,System.String,System.Threading.CancellationToken)">
             <summary>
             Get a book by id.
             </summary>
             <param name="id">The id of the book to get.</param>
             <param name="fields">The fields that are needed.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing the requested book.</returns>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.GetBooks(MyBook.API.ResourceParameters.BooksResourceParameters)">
+        <member name="M:MyBook.Controllers.BooksController.GetBooks(MyBook.API.ResourceParameters.BooksResourceParameters,System.Threading.CancellationToken)">
             <summary>
             Get all books.
             </summary>
             <param name="booksResourceParameters">Parameters for filtering, searching, and pagination.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing a list of books.</returns>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.CreateBookForAuthor(System.Guid,MyBook.API.Models.BookForCreationDto)">
+        <member name="M:MyBook.Controllers.BooksController.CreateBookForAuthor(System.Guid,MyBook.API.Models.BookForCreationDto,System.Threading.CancellationToken)">
             <summary>
             Create a new book for an author.
             </summary>
             <param name="authorId">The id of the author for whom the book is created.</param>
             <param name="book">The data for creating a new book.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult containing the created book.</returns>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.UpdateBook(System.Guid,System.Guid,MyBook.API.Models.BookForUpdateDto)">
+        <member name="M:MyBook.Controllers.BooksController.UpdateBook(System.Guid,System.Guid,MyBook.API.Models.BookForUpdateDto,System.Threading.CancellationToken)">
             <summary>
             Update an existing book.
             </summary>
             <param name="bookId">The id of the book to update.</param>
             <param name="authorId">The id of the author of the book.</param>
             <param name="book">The data for updating the book.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.PartiallyUpdateBook(System.Guid,System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{MyBook.API.Models.BookForUpdateDto})">
+        <member name="M:MyBook.Controllers.BooksController.PartiallyUpdateBook(System.Guid,System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{MyBook.API.Models.BookForUpdateDto},System.Threading.CancellationToken)">
             <summary>
             Partially update an existing book.
             </summary>
             <param name="bookId">The id of the book to update.</param>
             <param name="authorId">The id of the author of the book.</param>
             <param name="patchDocument">The patch document containing updates.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
-        <member name="M:MyBook.Controllers.BooksController.DeleteBook(System.Guid)">
+        <member name="M:MyBook.Controllers.BooksController.DeleteBook(System.Guid,System.Threading.CancellationToken)">
             <summary>
             Delete a book.
             </summary>
             <param name="bookId">The id of the book to delete.</param>
+            <param name="cancellationToken"> Cancellation token</param>
             <returns>An ActionResult indicating success or failure of the operation.</returns>
         </member>
     </members>

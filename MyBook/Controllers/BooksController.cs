@@ -58,6 +58,7 @@ namespace MyBook.Controllers
         /// </summary>
         /// <param name="id">The id of the book to get.</param>
         /// <param name="fields">The fields that are needed.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult containing the requested book.</returns>
         [HttpGet(Name = "GetBook")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
@@ -65,7 +66,7 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-        public async Task<ActionResult> GetBook(Guid id, string? fields)
+        public async Task<ActionResult> GetBook(Guid id, string? fields, CancellationToken cancellationToken)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
 
@@ -73,11 +74,11 @@ namespace MyBook.Controllers
             {
                 if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await GetBookInternal(id, fields, includeLinks: false);
+                    return await GetBookInternal(id, fields, includeLinks: false, cancellationToken);
                 }
                 else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await GetBookInternal(id, fields, includeLinks: true);
+                    return await GetBookInternal(id, fields, includeLinks: true, cancellationToken);
                 }
                 else
                 {
@@ -97,7 +98,7 @@ namespace MyBook.Controllers
             }
         }
 
-        private async Task<ActionResult> GetBookInternal(Guid id, string? fields, bool includeLinks)
+        private async Task<ActionResult> GetBookInternal(Guid id, string? fields, bool includeLinks, CancellationToken cancellationToken)
         {
             if (!_propertyCheckerService.TypeHasProperties<BookDto>(fields))
             {
@@ -107,7 +108,7 @@ namespace MyBook.Controllers
                     $"the resource: {fields}"));
             }
 
-            var book = await _myBookRepository.GetBookAsync(id);
+            var book = await _myBookRepository.GetBookAsync(id, cancellationToken);
 
             if (book == null)
             {
@@ -133,13 +134,14 @@ namespace MyBook.Controllers
         /// Get all books.
         /// </summary>
         /// <param name="booksResourceParameters">Parameters for filtering, searching, and pagination.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult containing a list of books.</returns>
         [HttpGet("all", Name = "GetBooks")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-        public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters)
+        public async Task<ActionResult> GetBooks([FromQuery] BooksResourceParameters booksResourceParameters, CancellationToken cancellationToken)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
 
@@ -147,11 +149,11 @@ namespace MyBook.Controllers
             {
                 if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await GetBooksInternal(booksResourceParameters, includeLinks: false);
+                    return await GetBooksInternal(booksResourceParameters, includeLinks: false, cancellationToken);
                 }
                 else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await GetBooksInternal(booksResourceParameters, includeLinks: true);
+                    return await GetBooksInternal(booksResourceParameters, includeLinks: true, cancellationToken);
                 }
                 else
                 {
@@ -171,7 +173,7 @@ namespace MyBook.Controllers
             }
         }
 
-        private async Task<ActionResult> GetBooksInternal(BooksResourceParameters booksResourceParameters, bool includeLinks)
+        private async Task<ActionResult> GetBooksInternal(BooksResourceParameters booksResourceParameters, bool includeLinks, CancellationToken cancellationToken)
         {
             if (!_propertyMappingService
             .ValidMappingExistsFor<BookDto, Book>(
@@ -191,7 +193,7 @@ namespace MyBook.Controllers
                     $"the resource: {booksResourceParameters.Fields}"));
             }
 
-            var books = await _myBookRepository.GetBooksAsync(booksResourceParameters);
+            var books = await _myBookRepository.GetBooksAsync(booksResourceParameters, cancellationToken);
 
             var paginationMetadata = new
             {
@@ -212,7 +214,7 @@ namespace MyBook.Controllers
 
                 var booksWithLinks = shapedBooks.Select(book =>
                 {
-                    var bookDictionary = book as IDictionary<string, object?>;
+                    var bookDictionary = book as IDictionary<string, object>;
 
                     var bookLinks = CreateLinksForBook((Guid)bookDictionary["Id"], (Guid)bookDictionary["AuthorId"], null);
 
@@ -240,12 +242,13 @@ namespace MyBook.Controllers
         /// </summary>
         /// <param name="authorId">The id of the author for whom the book is created.</param>
         /// <param name="book">The data for creating a new book.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult containing the created book.</returns>
         [HttpPost(Name = "CreateBookForAuthor")]
         [Produces("application/json", "application/vnd.mybook.book+json", "application/vnd.mybook.book.hateoas+json")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> CreateBookForAuthor(Guid authorId, BookForCreationDto book)
+        public async Task<ActionResult> CreateBookForAuthor(Guid authorId, BookForCreationDto book, CancellationToken cancellationToken)
         {
             var acceptHeader = Request.Headers.Accept.ToString();
 
@@ -253,11 +256,11 @@ namespace MyBook.Controllers
             {
                 if (ValidHeadersWithoutLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await CreateBookForAuthorInternal(authorId, book, includeLinks: false);
+                    return await CreateBookForAuthorInternal(authorId, book, includeLinks: false, cancellationToken);
                 }
                 else if (ValidHeadersWithLink.Contains(parsedAccept.MediaType.Value))
                 {
-                    return await CreateBookForAuthorInternal(authorId, book, includeLinks: true);
+                    return await CreateBookForAuthorInternal(authorId, book, includeLinks: true, cancellationToken);
                 }
                 else
                 {
@@ -277,9 +280,9 @@ namespace MyBook.Controllers
             }
         }
 
-        private async Task<ActionResult> CreateBookForAuthorInternal(Guid authorId, BookForCreationDto book, bool includeLinks)
+        private async Task<ActionResult> CreateBookForAuthorInternal(Guid authorId, BookForCreationDto book, bool includeLinks, CancellationToken cancellationToken)
         {
-            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            if (!await _myBookRepository.AuthorExistsAsync(authorId, cancellationToken))
             {
                 return NotFound(book);
             }
@@ -287,7 +290,7 @@ namespace MyBook.Controllers
             var bookEntity = _mapper.Map<Book>(book);
 
             _myBookRepository.AddBook(authorId, bookEntity);
-            await _myBookRepository.SaveAsync();
+            await _myBookRepository.SaveAsync(cancellationToken);
 
             var bookDto = _mapper.Map<BookDto>(bookEntity);
 
@@ -312,26 +315,27 @@ namespace MyBook.Controllers
         /// <param name="bookId">The id of the book to update.</param>
         /// <param name="authorId">The id of the author of the book.</param>
         /// <param name="book">The data for updating the book.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> UpdateBook(Guid bookId, Guid authorId, BookForUpdateDto book)
+        public async Task<ActionResult> UpdateBook(Guid bookId, Guid authorId, BookForUpdateDto book, CancellationToken cancellationToken)
         {
-            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            if (!await _myBookRepository.AuthorExistsAsync(authorId, cancellationToken))
             {
                 return NotFound();
             }
 
-            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId, cancellationToken);
 
             if (bookFromRepo == null)
             {
                 var bookToAdd = _mapper.Map<Book>(book);
 
                 _myBookRepository.AddBook(authorId, bookToAdd);
-                await _myBookRepository.SaveAsync();
+                await _myBookRepository.SaveAsync(cancellationToken);
 
                 var bookToReturn = _mapper.Map<BookDto>(bookToAdd);
 
@@ -342,7 +346,7 @@ namespace MyBook.Controllers
 
             _myBookRepository.UpdateBook(bookFromRepo);
 
-            await _myBookRepository.SaveAsync();
+            await _myBookRepository.SaveAsync(cancellationToken);
 
             return NoContent();
         }
@@ -353,6 +357,7 @@ namespace MyBook.Controllers
         /// <param name="bookId">The id of the book to update.</param>
         /// <param name="authorId">The id of the author of the book.</param>
         /// <param name="patchDocument">The patch document containing updates.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpPatch]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -360,14 +365,14 @@ namespace MyBook.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> PartiallyUpdateBook(Guid bookId, Guid authorId
-            , JsonPatchDocument<BookForUpdateDto> patchDocument)
+            , JsonPatchDocument<BookForUpdateDto> patchDocument, CancellationToken cancellationToken)
         {
-            if (!await _myBookRepository.AuthorExistsAsync(authorId))
+            if (!await _myBookRepository.AuthorExistsAsync(authorId, cancellationToken))
             {
                 return NotFound();
             }
 
-            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId, cancellationToken);
 
             if (bookFromRepo == null)
             {
@@ -384,7 +389,7 @@ namespace MyBook.Controllers
                 bookToAdd.Id = bookId;
 
                 _myBookRepository.AddBook(authorId, bookToAdd);
-                await _myBookRepository.SaveAsync();
+                await _myBookRepository.SaveAsync(cancellationToken);
 
                 var bookToReturn = _mapper.Map<BookDto>(bookToAdd);
 
@@ -403,7 +408,7 @@ namespace MyBook.Controllers
 
             _myBookRepository.UpdateBook(bookFromRepo);
 
-            await _myBookRepository.SaveAsync();
+            await _myBookRepository.SaveAsync(cancellationToken);
 
             return NoContent();
         }
@@ -412,13 +417,14 @@ namespace MyBook.Controllers
         /// Delete a book.
         /// </summary>
         /// <param name="bookId">The id of the book to delete.</param>
+        /// <param name="cancellationToken"> Cancellation token</param>
         /// <returns>An ActionResult indicating success or failure of the operation.</returns>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteBook(Guid bookId)
+        public async Task<ActionResult> DeleteBook(Guid bookId, CancellationToken cancellationToken)
         {
-            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId);
+            var bookFromRepo = await _myBookRepository.GetBookAsync(bookId, cancellationToken);
 
             if (bookFromRepo == null)
             {
@@ -426,7 +432,7 @@ namespace MyBook.Controllers
             }
 
             _myBookRepository.DeleteBook(bookFromRepo);
-            await _myBookRepository.SaveAsync();
+            await _myBookRepository.SaveAsync(cancellationToken);
 
             return NoContent();
         }
