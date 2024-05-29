@@ -1,7 +1,7 @@
 # MyBook: Simple Book Management Web API
 <img src="https://github.com/emaadgh/mybook/assets/10380342/8c04de39-c177-4dd8-866e-8fa6efd7e98d" width="150" height="150">
 
-**MyBook** is a well-structured and versatile **ASP.NET Core Web API** designed to streamline book-related data management. Whether you're building a personal library, crafting a comprehensive book catalog for an application, or seeking a robust foundation for more complex book management systems, MyBook offers the essential endpoints and features to effectively handle book CRUD (Create, Read, Update, Delete) operations along with enhancements for filtering, searching, ordering, pagination, and data shaping.
+**MyBook** is a well-structured and versatile **ASP.NET Core Web API** designed to streamline book-related data management. Whether you're building a personal library, crafting a comprehensive book catalog for an application, or seeking a robust foundation for more complex book management systems, MyBook offers the essential endpoints and features to effectively handle book CRUD (Create, Read, Update, Delete) operations along with enhancements for filtering, searching, ordering, pagination, and data shaping. Additionally, MyBook supports HATEOAS links, allowing clients to navigate the API dynamically by providing relevant links in the responses.
 
 ## Getting Started
 
@@ -22,21 +22,21 @@
         ```
 
     **Dependencies** (for MyBook API project):
-    - AutoMapper.Extensions.Microsoft.DependencyInjection (v12.0.1)
-    - Microsoft.AspNetCore.JsonPatch (v8.0.1)
-    - Microsoft.AspNetCore.Mvc.NewtonsoftJson (v8.0.1)
-    - Microsoft.EntityFrameworkCore.SqlServer (v8.0.1)
-    - Microsoft.EntityFrameworkCore.Tools (v8.0.1)
-    - Microsoft.VisualStudio.Azure.Containers.Tools.Targets (v1.19.5)
-    - Swashbuckle.AspNetCore (v6.4.0)
-    - System.Linq.Dynamic.Core (v1.3.8)
+    - AutoMapper
+    - Microsoft.AspNetCore.JsonPatch
+    - Microsoft.AspNetCore.Mvc.NewtonsoftJson
+    - Microsoft.EntityFrameworkCore.SqlServer
+    - Microsoft.EntityFrameworkCore.Tools
+    - Microsoft.VisualStudio.Azure.Containers.Tools.Targets
+    - Swashbuckle.AspNetCore
+    - System.Linq.Dynamic.Core
 
     **Dependencies** (for MyBook Test project):
-    - Microsoft.NET.Test.Sdk (v17.8.0)
-    - Moq (v4.20.70)
-    - xunit (v2.6.6)
-    - xunit.runner.visualstudio (v2.5.6)
-    - coverlet.collector (v6.0.0)
+    - Microsoft.NET.Test.Sdk
+    - Moq
+    - xunit
+    - xunit.runner.visualstudio
+    - coverlet.collector
 
 3. **Run the Application**:
     - Start the API by running the following command in your terminal:
@@ -146,7 +146,7 @@ With Docker and Docker Compose, you can easily deploy and manage the MyBook API 
 
 ## MyBook Test Project
 
-The `mybook.test` project contains unit tests that validate the behavior of various components within the MyBook API. These unit tests cover Controllers, Helper classes, AutoMapper Profiles, ResourceParameters, and Services used in the project.
+The `MyBook.UnitTests` project contains unit tests that validate the behavior of various components within the MyBook API. These unit tests cover Controllers, Helper classes, AutoMapper Profiles, ResourceParameters, and Services used in the project.
 
 These tests are crucial for ensuring the correctness and reliability of the MyBook API. They are automatically executed as part of the CI/CD pipeline to maintain code quality and identify any regressions that may occur during development.
 
