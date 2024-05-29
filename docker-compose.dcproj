@@ -4,7 +4,7 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <DockerPublishLocally>False</DockerPublishLocally>
-    <ProjectGuid>fd18c8be-9479-43ed-bca0-3a8d162d80e1</ProjectGuid>
+    <ProjectGuid>3e6aa8f6-67e7-4662-a9df-c7e440489ce7</ProjectGuid>
     <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
     <DockerServiceUrl>{Scheme}://localhost:{ServicePort}/swagger</DockerServiceUrl>
     <DockerServiceName>mybook.api</DockerServiceName>

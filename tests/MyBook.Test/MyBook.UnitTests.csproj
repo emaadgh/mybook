@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MyBook\MyBook.API.csproj" />
+    <ProjectReference Include="..\..\src\MyBook.API\MyBook.API.csproj" />
   </ItemGroup>
 
 </Project>
