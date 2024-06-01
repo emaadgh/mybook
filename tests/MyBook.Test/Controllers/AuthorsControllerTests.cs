@@ -11,176 +11,175 @@ using MyBook.Entities;
 using MyBook.Services;
 using System.Dynamic;
 
-namespace MyBook.Test.Controllers
+namespace MyBook.Test.Controllers;
+
+public class AuthorsControllerTests
 {
-    public class AuthorsControllerTests
+    private readonly Mock<IMyBookRepository> _mockRepository;
+    private readonly Mock<IMapper> _mockMapper;
+    private readonly IPropertyMappingService _propertyMappingService;
+    private readonly IPropertyCheckerService _propertyCheckerService;
+    private readonly Mock<ProblemDetailsFactory> _mockProblemDetailsFactory;
+
+    private readonly AuthorsController _controller;
+
+    public AuthorsControllerTests()
     {
-        private readonly Mock<IMyBookRepository> _mockRepository;
-        private readonly Mock<IMapper> _mockMapper;
-        private readonly IPropertyMappingService _propertyMappingService;
-        private readonly IPropertyCheckerService _propertyCheckerService;
-        private readonly Mock<ProblemDetailsFactory> _mockProblemDetailsFactory;
+        _mockRepository = new Mock<IMyBookRepository>();
+        _mockMapper = new Mock<IMapper>();
+        _propertyMappingService = new PropertyMappingService();
+        _propertyCheckerService = new PropertyCheckerService();
+        _mockProblemDetailsFactory = new Mock<ProblemDetailsFactory>();
 
-        private readonly AuthorsController _controller;
+        _controller = new AuthorsController(_mockRepository.Object, _mockMapper.Object, _propertyMappingService, _propertyCheckerService, _mockProblemDetailsFactory.Object);
 
-        public AuthorsControllerTests()
+        var httpContext = new DefaultHttpContext();
+        httpContext.Request.Headers.Accept = "application/json";
+
+        _controller.ControllerContext = new ControllerContext
         {
-            _mockRepository = new Mock<IMyBookRepository>();
-            _mockMapper = new Mock<IMapper>();
-            _propertyMappingService = new PropertyMappingService();
-            _propertyCheckerService = new PropertyCheckerService();
-            _mockProblemDetailsFactory = new Mock<ProblemDetailsFactory>();
+            HttpContext = httpContext,
+        };
+    }
 
-            _controller = new AuthorsController(_mockRepository.Object, _mockMapper.Object, _propertyMappingService, _propertyCheckerService, _mockProblemDetailsFactory.Object);
+    [Fact]
+    public async Task GetAuthorWithoutLinks_AuthorExists_MustReturnsOkResult()
+    {
+        // Arrange
+        var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
 
-            var httpContext = new DefaultHttpContext();
-            httpContext.Request.Headers.Accept = "application/json";
+        Author author = new Author("test");
 
-            _controller.ControllerContext = new ControllerContext
-            {
-                HttpContext = httpContext,
-            };
-        }
+        AuthorDto authorDto = new AuthorDto();
+        authorDto.Id = authorId;
 
-        [Fact]
-        public async Task GetAuthorWithoutLinks_AuthorExists_MustReturnsOkResult()
-        {
-            // Arrange
-            var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            Author author = new Author("test");
+        _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
+        _mockMapper.Setup(mapper => mapper.Map<AuthorDto>(author)).Returns(authorDto);
 
-            AuthorDto authorDto = new AuthorDto();
-            authorDto.Id = authorId;
+        // Act
+        var result = await _controller.GetAuthor(authorId, null, cancellationToken);
 
-            CancellationToken cancellationToken = CancellationToken.None;
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var model = Assert.IsAssignableFrom<ExpandoObject>(okResult.Value);
+        var expandoDictionary = model as IDictionary<string, object?>;
+        Assert.Equal(authorId, expandoDictionary["Id"]);
+    }
 
-            _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
-            _mockMapper.Setup(mapper => mapper.Map<AuthorDto>(author)).Returns(authorDto);
+    [Fact]
+    public async Task GetAuthorWithoutLinks_FieldIsInvalid_MustReturnsBadRequest()
+    {
+        // Arrange
+        var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+        string fields = "notValidField";
 
-            // Act
-            var result = await _controller.GetAuthor(authorId, null, cancellationToken);
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            // Assert
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var model = Assert.IsAssignableFrom<ExpandoObject>(okResult.Value);
-            var expandoDictionary = model as IDictionary<string, object?>;
-            Assert.Equal(authorId, expandoDictionary["Id"]);
-        }
+        // Act
+        var result = await _controller.GetAuthor(authorId, fields, cancellationToken);
 
-        [Fact]
-        public async Task GetAuthorWithoutLinks_FieldIsInvalid_MustReturnsBadRequest()
-        {
-            // Arrange
-            var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
-            string fields = "notValidField";
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
 
-            CancellationToken cancellationToken = CancellationToken.None;
+    [Fact]
+    public async Task GetAuthorWithoutLinks_AuthorNotExist_MustReturnsNotFound()
+    {
+        // Arrange
+        var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+        Author? author = null;
 
-            // Act
-            var result = await _controller.GetAuthor(authorId, fields, cancellationToken);
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-        }
+        _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
 
-        [Fact]
-        public async Task GetAuthorWithoutLinks_AuthorNotExist_MustReturnsNotFound()
-        {
-            // Arrange
-            var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
-            Author? author = null;
+        // Act
+        var result = await _controller.GetAuthor(authorId, null, cancellationToken);
 
-            CancellationToken cancellationToken = CancellationToken.None;
+        // Assert
+        Assert.IsType<NotFoundResult>(result);
+    }
 
-            _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
+    [Fact]
+    public async Task GetAuthorsWithoutLinks_InvalidOrderByParameter_MustReturnsBadRequest()
+    {
+        // Arrange
+        AuthorsResourceParameters authorsResourceParameters = new AuthorsResourceParameters();
+        authorsResourceParameters.OrderBy = "NotAValidParameter";
 
-            // Act
-            var result = await _controller.GetAuthor(authorId, null, cancellationToken);
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            // Assert
-            Assert.IsType<NotFoundResult>(result);
-        }
+        _mockRepository.Setup(repo => repo.GetAuthorsAsync(authorsResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Author>(new List<Author>(), 0, 0, 4));
 
-        [Fact]
-        public async Task GetAuthorsWithoutLinks_InvalidOrderByParameter_MustReturnsBadRequest()
-        {
-            // Arrange
-            AuthorsResourceParameters authorsResourceParameters = new AuthorsResourceParameters();
-            authorsResourceParameters.OrderBy = "NotAValidParameter";
+        // Act
+        var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
 
-            CancellationToken cancellationToken = CancellationToken.None;
+        // Assert
+        Assert.IsType<BadRequestObjectResult>(result);
+    }
 
-            _mockRepository.Setup(repo => repo.GetAuthorsAsync(authorsResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Author>(new List<Author>(), 0, 0, 4));
+    [Fact]
+    public async Task GetAuthorsWithoutLinks_ValidOrderByParameter_MustReturnsOkObjectResult()
+    {
+        // Arrange
+        AuthorsResourceParameters authorsResourceParameters = new AuthorsResourceParameters();
+        authorsResourceParameters.OrderBy = "Name";
 
-            // Act
-            var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
-        }
+        _mockRepository.Setup(repo => repo.GetAuthorsAsync(authorsResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Author>(new List<Author>(), 0, 0, 4));
 
-        [Fact]
-        public async Task GetAuthorsWithoutLinks_ValidOrderByParameter_MustReturnsOkObjectResult()
-        {
-            // Arrange
-            AuthorsResourceParameters authorsResourceParameters = new AuthorsResourceParameters();
-            authorsResourceParameters.OrderBy = "Name";
+        // Act
+        var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
 
-            CancellationToken cancellationToken = CancellationToken.None;
+        // Assert
+        Assert.IsType<OkObjectResult>(result);
+    }
 
-            _mockRepository.Setup(repo => repo.GetAuthorsAsync(authorsResourceParameters, cancellationToken)).ReturnsAsync(new API.Helpers.PagedList<Author>(new List<Author>(), 0, 0, 4));
+    [Fact]
+    public async Task CreateAuthorWithoutLinks_AuthorCreated_MustReturnsCreatedAtRouteResult()
+    {
+        // Arrange
+        AuthorForCreationDto authorForCreationDto = new AuthorForCreationDto();
+        authorForCreationDto.Name = "Name";
 
-            // Act
-            var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
+        Author author = new Author("test name");
 
-            // Assert
-            Assert.IsType<OkObjectResult>(result);
-        }
+        AuthorDto authorDto = new AuthorDto();
+        authorDto.Id = Guid.NewGuid();
 
-        [Fact]
-        public async Task CreateAuthorWithoutLinks_AuthorCreated_MustReturnsCreatedAtRouteResult()
-        {
-            // Arrange
-            AuthorForCreationDto authorForCreationDto = new AuthorForCreationDto();
-            authorForCreationDto.Name = "Name";
+        _mockMapper.Setup(mapper => mapper.Map<Author>(authorForCreationDto)).Returns(author);
+        _mockMapper.Setup(mapper => mapper.Map<AuthorDto>(author)).Returns(authorDto);
 
-            Author author = new Author("test name");
+        CancellationToken cancellationToken = CancellationToken.None;
 
-            AuthorDto authorDto = new AuthorDto();
-            authorDto.Id = Guid.NewGuid();
+        // Act
+        var result = await _controller.CreateAuthor(authorForCreationDto, cancellationToken);
 
-            _mockMapper.Setup(mapper => mapper.Map<Author>(authorForCreationDto)).Returns(author);
-            _mockMapper.Setup(mapper => mapper.Map<AuthorDto>(author)).Returns(authorDto);
+        // Assert
+        var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
+        Assert.Equal(Guid.Parse($"{createdAtRouteResult.RouteValues?["id"]}"), authorDto.Id);
+    }
 
-            CancellationToken cancellationToken = CancellationToken.None;
+    [Fact]
+    public async Task DeleteAuthor_AuthorCantBeDeletedCauseHasBooks_MustReturnsConflict()
+    {
+        // Arrange
+        var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
 
-            // Act
-            var result = await _controller.CreateAuthor(authorForCreationDto, cancellationToken);
+        Author author = new Author("test name");
 
-            // Assert
-            var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
-            Assert.Equal(Guid.Parse($"{createdAtRouteResult.RouteValues?["id"]}"), authorDto.Id);
-        }
+        CancellationToken cancellationToken = CancellationToken.None;
 
-        [Fact]
-        public async Task DeleteAuthor_AuthorCantBeDeletedCauseHasBooks_MustReturnsConflict()
-        {
-            // Arrange
-            var authorId = Guid.Parse("ffba8a54-c990-4862-931e-927b35b3b003");
+        _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
+        _mockRepository.Setup(repo => repo.BookForAuthorExistsAsync(authorId, cancellationToken)).ReturnsAsync(true);
 
-            Author author = new Author("test name");
+        // Act
+        var result = await _controller.DeleteAuthor(authorId, cancellationToken);
 
-            CancellationToken cancellationToken = CancellationToken.None;
-
-            _mockRepository.Setup(repo => repo.GetAuthorAsync(authorId, cancellationToken)).ReturnsAsync(author);
-            _mockRepository.Setup(repo => repo.BookForAuthorExistsAsync(authorId, cancellationToken)).ReturnsAsync(true);
-
-            // Act
-            var result = await _controller.DeleteAuthor(authorId, cancellationToken);
-
-            // Assert
-            Assert.IsType<ConflictObjectResult>(result);
-        }
+        // Assert
+        Assert.IsType<ConflictObjectResult>(result);
     }
 }

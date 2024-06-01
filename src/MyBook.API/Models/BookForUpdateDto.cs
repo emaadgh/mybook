@@ -1,9 +1,8 @@
-﻿namespace MyBook.API.Models
+﻿namespace MyBook.API.Models;
+
+/// <summary>
+/// Data transfer object (DTO) for updating book entities.
+/// </summary>
+public class BookForUpdateDto : BookForManipulationDto
 {
-    /// <summary>
-    /// Data transfer object (DTO) for updating book entities.
-    /// </summary>
-    public class BookForUpdateDto : BookForManipulationDto
-    {
-    }
 }

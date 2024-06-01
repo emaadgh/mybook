@@ -2,15 +2,14 @@
 using MyBook.API.Models;
 using MyBook.Entities;
 
-namespace MyBook.API.Profiles
+namespace MyBook.API.Profiles;
+
+public class AuthorProfile :Profile
 {
-    public class AuthorProfile :Profile
+    public AuthorProfile() 
     {
-        public AuthorProfile() 
-        {
-            CreateMap<Author, AuthorDto>();
-            CreateMap<AuthorForCreationDto, Author>();
-            CreateMap<AuthorForUpdateDto, Author>().ReverseMap();
-        }
+        CreateMap<Author, AuthorDto>();
+        CreateMap<AuthorForCreationDto, Author>();
+        CreateMap<AuthorForUpdateDto, Author>().ReverseMap();
     }
 }

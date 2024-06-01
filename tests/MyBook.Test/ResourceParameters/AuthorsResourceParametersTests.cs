@@ -1,38 +1,32 @@
 ﻿using MyBook.API.ResourceParameters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MyBook.Test.ResourceParameters
+namespace MyBook.Test.ResourceParameters;
+
+public class AuthorsResourceParametersTests
 {
-    public class AuthorsResourceParametersTests
+    [Fact]
+    public void PageSize_SetToValueGreaterThanMaxPageSize_MustEqualsMaxPageSize()
     {
-        [Fact]
-        public void PageSize_SetToValueGreaterThanMaxPageSize_MustEqualsMaxPageSize()
-        {
-            // Arrange
-            var parameters = new AuthorsResourceParameters();
+        // Arrange
+        var parameters = new AuthorsResourceParameters();
 
-            // Act
-            parameters.PageSize = 20;
+        // Act
+        parameters.PageSize = 20;
 
-            // Assert
-            Assert.Equal(parameters.MaxPageSize, parameters.PageSize);
-        }
+        // Assert
+        Assert.Equal(parameters.MaxPageSize, parameters.PageSize);
+    }
 
-        [Fact]
-        public void PageSize_SetToValidValue_MustNotChangeValue()
-        {
-            // Arrange
-            var parameters = new AuthorsResourceParameters();
+    [Fact]
+    public void PageSize_SetToValidValue_MustNotChangeValue()
+    {
+        // Arrange
+        var parameters = new AuthorsResourceParameters();
 
-            // Act
-            parameters.PageSize = 7;
+        // Act
+        parameters.PageSize = 7;
 
-            // Assert
-            Assert.Equal(7, parameters.PageSize);
-        }
+        // Assert
+        Assert.Equal(7, parameters.PageSize);
     }
 }

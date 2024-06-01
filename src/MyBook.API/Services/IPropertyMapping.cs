@@ -1,6 +1,5 @@
-﻿namespace MyBook.API.Services
+﻿namespace MyBook.API.Services;
+
+public interface IPropertyMapping
 {
-    public interface IPropertyMapping
-    {
-    }
 }

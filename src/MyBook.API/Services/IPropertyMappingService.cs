@@ -1,9 +1,8 @@
 ﻿
-namespace MyBook.API.Services
+namespace MyBook.API.Services;
+
+public interface IPropertyMappingService
 {
-    public interface IPropertyMappingService
-    {
-        Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>();
-        bool ValidMappingExistsFor<TSource, TDestination>(string orderBy);
-    }
+    Dictionary<string, PropertyMappingValue> GetPropertyMapping<TSource, TDestination>();
+    bool ValidMappingExistsFor<TSource, TDestination>(string orderBy);
 }

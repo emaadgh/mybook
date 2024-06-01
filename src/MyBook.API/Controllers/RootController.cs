@@ -2,42 +2,41 @@
 using Microsoft.AspNetCore.RateLimiting;
 using MyBook.API.Models;
 
-namespace MyBook.API.Controllers
+namespace MyBook.API.Controllers;
+
+/// <summary>
+/// Controller for accessing root API endpoints.
+/// </summary>
+[Route("api")]
+[ApiController]
+public class RootController : ControllerBase
 {
     /// <summary>
-    /// Controller for accessing root API endpoints.
+    /// Get the root of the API.
     /// </summary>
-    [Route("api")]
-    [ApiController]
-    public class RootController : ControllerBase
+    /// <returns>An IActionResult containing links to different API endpoints.</returns> 
+    [HttpGet(Name = "GetRoot")]
+    [EnableRateLimiting("GlobalRateLimit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
+    public IActionResult GetRoot()
     {
-        /// <summary>
-        /// Get the root of the API.
-        /// </summary>
-        /// <returns>An IActionResult containing links to different API endpoints.</returns> 
-        [HttpGet(Name = "GetRoot")]
-        [EnableRateLimiting("GlobalRateLimit")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-        public IActionResult GetRoot()
+        var links = new List<LinkDto>
         {
-            var links = new List<LinkDto>
-            {
-                new(Url.Link("GetRoot", new { }),
-                    "self",
-                    "GET"),
-                new(Url.Link("GetAuthors", new { }),
-                    "authors",
-                    "GET"),
-                new(Url.Link("GetBooks", new { }),
-                    "books",
-                    "GET"),
-                new(Url.Link("CreateAuthor", new { }),
-                    "create_author",
-                    "POST")
-            };
+            new(Url.Link("GetRoot", new { }),
+                "self",
+                "GET"),
+            new(Url.Link("GetAuthors", new { }),
+                "authors",
+                "GET"),
+            new(Url.Link("GetBooks", new { }),
+                "books",
+                "GET"),
+            new(Url.Link("CreateAuthor", new { }),
+                "create_author",
+                "POST")
+        };
 
-            return Ok(links);
-        }
+        return Ok(links);
     }
 }

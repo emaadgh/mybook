@@ -1,7 +1,6 @@
-﻿namespace MyBook.API.Services
+﻿namespace MyBook.API.Services;
+
+public interface IPropertyCheckerService
 {
-    public interface IPropertyCheckerService
-    {
-        bool TypeHasProperties<T>(string? fields);
-    }
+    bool TypeHasProperties<T>(string? fields);
 }

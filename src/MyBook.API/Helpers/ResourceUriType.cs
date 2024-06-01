@@ -1,9 +1,8 @@
-﻿namespace MyBook.API.Helpers
+﻿namespace MyBook.API.Helpers;
+
+public enum ResourceUriType
 {
-    public enum ResourceUriType
-    {
-        PreviousPage,
-        NextPage,
-        Current
-    }
+    PreviousPage,
+    NextPage,
+    Current
 }
