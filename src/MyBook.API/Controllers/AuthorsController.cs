@@ -30,14 +30,14 @@ public class AuthorsController : Controller
 
     private readonly string _authorShapingRequiredFields = JsonNamingPolicy.CamelCase.ConvertName(nameof(AuthorDto.Id));
 
-    private readonly string[] ValidHeadersWithoutLink = new[]
+    private readonly string[] ValidHeadersWithoutLink =
     {
         "*/*",
         "application/json",
         "application/vnd.mybook.author+json"
     };
 
-    private readonly string[] ValidHeadersWithLink = new[]
+    private readonly string[] ValidHeadersWithLink =
     {
         "application/vnd.mybook.author.hateoas+json"
     };
@@ -87,7 +87,7 @@ public class AuthorsController : Controller
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 
@@ -162,7 +162,7 @@ public class AuthorsController : Controller
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 
@@ -269,7 +269,7 @@ public class AuthorsController : Controller
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 

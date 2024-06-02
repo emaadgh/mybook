@@ -28,14 +28,14 @@ public class BooksController : ControllerBase
 
     private readonly string _bookShapingRequiredFields = JsonNamingPolicy.CamelCase.ConvertName(nameof(BookDto.Id)) + ',' + JsonNamingPolicy.CamelCase.ConvertName(nameof(BookDto.AuthorId));
 
-    private readonly string[] ValidHeadersWithoutLink = new[]
+    private readonly string[] ValidHeadersWithoutLink =
     {
         "*/*",
         "application/json",
         "application/vnd.mybook.book+json"
     };
 
-    private readonly string[] ValidHeadersWithLink = new[]
+    private readonly string[] ValidHeadersWithLink =
     {
         "application/vnd.mybook.book.hateoas+json"
     };
@@ -85,7 +85,7 @@ public class BooksController : ControllerBase
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 
@@ -160,7 +160,7 @@ public class BooksController : ControllerBase
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 
@@ -267,7 +267,7 @@ public class BooksController : ControllerBase
                 var problemDetails = new ProblemDetails
                 {
                     Detail = "The Accept header value is not supported. Supported values are: "
-                     + string.Join(", ", ValidHeadersWithoutLink) + string.Join(", ", ValidHeadersWithLink),
+                    + $", {ValidHeadersWithoutLink}, {ValidHeadersWithLink}",
                     Status = StatusCodes.Status406NotAcceptable
                 };
 
