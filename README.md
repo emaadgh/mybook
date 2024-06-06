@@ -1,7 +1,7 @@
 # MyBook: Simple Book Management Web API
 <img src="https://github.com/emaadgh/mybook/assets/10380342/8c04de39-c177-4dd8-866e-8fa6efd7e98d" width="150" height="150">
 
-**MyBook** is a well-structured and versatile **ASP.NET Core Web API** designed to streamline book-related data management. Whether you're building a personal library, crafting a comprehensive book catalog for an application, or seeking a robust foundation for more complex book management systems, MyBook offers the essential endpoints and features to effectively handle book CRUD (Create, Read, Update, Delete) operations along with enhancements for filtering, searching, ordering, pagination, and data shaping. Additionally, MyBook supports HATEOAS links, allowing clients to navigate the API dynamically by providing relevant links in the responses.
+**MyBook** is a well-structured and versatile **ASP.NET Core Web API** designed to streamline book-related data management. MyBook offers the essential endpoints and features to effectively handle book CRUD (Create, Read, Update, Delete) operations and enhancements for filtering, searching, ordering, pagination, and data shaping. Additionally, MyBook supports HATEOAS links, allowing clients to navigate the API dynamically by providing relevant links in the responses.
 
 ## Getting Started
 
