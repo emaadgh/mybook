@@ -37,6 +37,7 @@
     - xunit
     - xunit.runner.visualstudio
     - coverlet.collector
+    - FluentAssertions
 
 3. **Run the Application**:
     - Start the API by running the following command in your terminal:
