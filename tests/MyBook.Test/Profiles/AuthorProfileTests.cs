@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentAssertions;
 using MyBook.API.Models;
 using MyBook.API.Profiles;
 using MyBook.Entities;
@@ -27,8 +28,8 @@ public class AuthorProfileTests
         var authorDto = _mapper.Map<AuthorDto>(author);
 
         // Assert
-        Assert.Equal(author.Id, authorDto.Id);
-        Assert.Equal(author.Name, authorDto.Name);
+        authorDto.Id.Should().Be(author.Id);
+        authorDto.Name.Should().Be(author.Name);
     }
 
     [Fact]
@@ -41,7 +42,7 @@ public class AuthorProfileTests
         var author = _mapper.Map<Author>(authorForCreationDto);
 
         // Assert
-        Assert.Equal(authorForCreationDto.Name, author.Name);
+        author.Name.Should().Be(authorForCreationDto.Name);
     }
 
     [Fact]
@@ -54,7 +55,7 @@ public class AuthorProfileTests
         var author = _mapper.Map<Author>(authorForUpdateDto);
 
         // Assert
-        Assert.Equal(authorForUpdateDto.Name, author.Name);
+        author.Name.Should().Be(authorForUpdateDto.Name);
     }
 
     [Fact]
@@ -67,6 +68,6 @@ public class AuthorProfileTests
         var authorForUpdateDtoMapped = _mapper.Map<AuthorForUpdateDto>(_mapper.Map<Author>(authorForUpdateDto));
 
         // Assert
-        Assert.Equal(authorForUpdateDto.Name, authorForUpdateDtoMapped.Name);
+        authorForUpdateDtoMapped.Name.Should().Be(authorForUpdateDto.Name);
     }
 }

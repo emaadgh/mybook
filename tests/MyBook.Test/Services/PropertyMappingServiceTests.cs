@@ -1,4 +1,5 @@
-﻿using MyBook.API.Services;
+﻿using FluentAssertions;
+using MyBook.API.Services;
 using MyBook.Entities;
 using MyBook.Models;
 
@@ -20,15 +21,16 @@ public class PropertyMappingServiceTests
         var mapping = _propertyMappingService.GetPropertyMapping<BookDto, Book>();
 
         // Assert
-        Assert.NotNull(mapping);
-        Assert.NotEmpty(mapping);
+        mapping.Should().NotBeNull();
+        mapping.Should().NotBeEmpty();
     }
 
     [Fact]
     public void GetPropertyMapping_ValidMappingDoesNotExist_MustThrowsException()
     {
         // Act & Assert
-        Assert.Throws<Exception>(() => _propertyMappingService.GetPropertyMapping<BookDto, Author>());
+        Action action = () => _propertyMappingService.GetPropertyMapping<BookDto, Author>();
+        action.Should().Throw<Exception>();
     }
 
     [Theory]
@@ -41,7 +43,7 @@ public class PropertyMappingServiceTests
         var result = _propertyMappingService.ValidMappingExistsFor<BookDto, Book>(orderBy);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
     }
 
     [Theory]
@@ -53,6 +55,6 @@ public class PropertyMappingServiceTests
         var result = _propertyMappingService.ValidMappingExistsFor<BookDto, Book>(orderBy);
 
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
     }
 }

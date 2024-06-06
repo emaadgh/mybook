@@ -1,4 +1,5 @@
-﻿using MyBook.API.Helpers;
+﻿using FluentAssertions;
+using MyBook.API.Helpers;
 
 namespace MyBook.Test.Helpers;
 
@@ -18,7 +19,7 @@ public class PagedListTests
         bool hasPrevious = pagedList.HasPrevious;
 
         //Assert
-        Assert.True(hasPrevious);
+        hasPrevious.Should().BeTrue();
     }
 
     [Fact]
@@ -28,6 +29,6 @@ public class PagedListTests
         bool hasNext = pagedList.HasNext;
 
         //Assert
-        Assert.True(hasNext);
+        hasNext.Should().BeTrue();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -62,10 +63,11 @@ public class AuthorsControllerTests
         var result = await _controller.GetAuthor(authorId, null, cancellationToken);
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var model = Assert.IsAssignableFrom<ExpandoObject>(okResult.Value);
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var model = okResult.Value.Should().BeAssignableTo<ExpandoObject>().Subject;
+
         var expandoDictionary = model as IDictionary<string, object?>;
-        Assert.Equal(authorId, expandoDictionary["Id"]);
+        expandoDictionary["Id"].Should().Be(authorId);
     }
 
     [Fact]
@@ -81,7 +83,7 @@ public class AuthorsControllerTests
         var result = await _controller.GetAuthor(authorId, fields, cancellationToken);
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     [Fact]
@@ -99,7 +101,7 @@ public class AuthorsControllerTests
         var result = await _controller.GetAuthor(authorId, null, cancellationToken);
 
         // Assert
-        Assert.IsType<NotFoundResult>(result);
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
@@ -117,7 +119,7 @@ public class AuthorsControllerTests
         var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     [Fact]
@@ -135,7 +137,7 @@ public class AuthorsControllerTests
         var result = await _controller.GetAuthors(authorsResourceParameters, cancellationToken);
 
         // Assert
-        Assert.IsType<OkObjectResult>(result);
+        result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
@@ -159,8 +161,8 @@ public class AuthorsControllerTests
         var result = await _controller.CreateAuthor(authorForCreationDto, cancellationToken);
 
         // Assert
-        var createdAtRouteResult = Assert.IsType<CreatedAtRouteResult>(result);
-        Assert.Equal(Guid.Parse($"{createdAtRouteResult.RouteValues?["id"]}"), authorDto.Id);
+        var createdAtRouteResult = result.Should().BeOfType<CreatedAtRouteResult>().Subject;
+        authorDto.Id.Should().Be(Guid.Parse($"{createdAtRouteResult.RouteValues?["id"]}"));
     }
 
     [Fact]
@@ -180,6 +182,6 @@ public class AuthorsControllerTests
         var result = await _controller.DeleteAuthor(authorId, cancellationToken);
 
         // Assert
-        Assert.IsType<ConflictObjectResult>(result);
+        result.Should().BeOfType<ConflictObjectResult>();
     }
 }

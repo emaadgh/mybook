@@ -1,4 +1,5 @@
-﻿using MyBook.API.Helpers;
+﻿using FluentAssertions;
+using MyBook.API.Helpers;
 using MyBook.API.Services;
 
 namespace MyBook.Test.Helpers;
@@ -26,9 +27,9 @@ public class IQueryableExtensionsTests
         var sortedQuery = source.ApplySort("Name desc", mappingDictionary).ToList();
 
         // Assert
-        Assert.Equal("C", sortedQuery[0].Name);
-        Assert.Equal("B", sortedQuery[1].Name);
-        Assert.Equal("A", sortedQuery[2].Name);
+        sortedQuery[0].Name.Should().Be("C");
+        sortedQuery[1].Name.Should().Be("B");
+        sortedQuery[2].Name.Should().Be("A");
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class IQueryableExtensionsTests
         var sortedQuery = source.ApplySort("", mappingDictionary);
 
         // Assert
-        Assert.Same(source, sortedQuery);
+        sortedQuery.Should().BeSameAs(source);
     }
 
     [Fact]
@@ -53,7 +54,8 @@ public class IQueryableExtensionsTests
         var mappingDictionary = new Dictionary<string, PropertyMappingValue>();
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => source.ApplySort("Name", mappingDictionary));
+        Action action = () => source.ApplySort("Name", mappingDictionary);
+        action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -64,7 +66,8 @@ public class IQueryableExtensionsTests
         Dictionary<string, PropertyMappingValue>? mappingDictionary = null!;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => source.ApplySort("Name", mappingDictionary));
+        Action action = () => source.ApplySort("Name", mappingDictionary);
+        action.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
@@ -75,7 +78,8 @@ public class IQueryableExtensionsTests
         var mappingDictionary = new Dictionary<string, PropertyMappingValue>();
 
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => source.ApplySort("InvalidProperty", mappingDictionary));
+        Action action = () => source.ApplySort("InvalidProperty", mappingDictionary);
+        action.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -98,9 +102,9 @@ public class IQueryableExtensionsTests
         var sortedQuery = source.ApplySort("Id", mappingDictionary).ToList();
 
         // Assert
-        Assert.Equal(3, sortedQuery[0].Id);
-        Assert.Equal(2, sortedQuery[1].Id);
-        Assert.Equal(1, sortedQuery[2].Id);
+        sortedQuery[0].Id.Should().Be(3);
+        sortedQuery[1].Id.Should().Be(2);
+        sortedQuery[2].Id.Should().Be(1);
     }
 
     private class TestEntity

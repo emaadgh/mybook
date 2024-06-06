@@ -1,4 +1,5 @@
-﻿using MyBook.API.Helpers;
+﻿using FluentAssertions;
+using MyBook.API.Helpers;
 
 namespace MyBook.Test.Helpers;
 
@@ -17,7 +18,7 @@ public class ObjectExtensionsTests
         var shapedData = testObjectSource.ShapeData(null, null);
 
         // Assert
-        Assert.Equal(3, ((IDictionary<string, object?>)shapedData).Count);
+        ((IDictionary<string, object?>)shapedData).Count.Should().Be(3);
     }
 
     [Fact]
@@ -27,9 +28,11 @@ public class ObjectExtensionsTests
         var shapedData = testObjectSource.ShapeData("Id,Name", null);
 
         // Assert
-        Assert.Equal(2, ((IDictionary<string, object?>)shapedData).Count);
-        Assert.Contains("Id", ((IDictionary<string, object?>)shapedData).Keys);
-        Assert.Contains("Name", ((IDictionary<string, object?>)shapedData).Keys);
+        IDictionary<string, object?> shapedDataDictionary = shapedData;
+
+        shapedDataDictionary.Count.Should().Be(2);
+        shapedDataDictionary.Keys.Should().Contain("Id");
+        shapedDataDictionary.Keys.Should().Contain("Name");
     }
 
     [Fact]
@@ -39,16 +42,19 @@ public class ObjectExtensionsTests
         var shapedData = testObjectSource.ShapeData("Id", "Name");
 
         // Assert
-        Assert.Equal(2, ((IDictionary<string, object?>)shapedData).Count);
-        Assert.Contains("Id", ((IDictionary<string, object?>)shapedData).Keys);
-        Assert.Contains("Name", ((IDictionary<string, object?>)shapedData).Keys);
+        IDictionary<string, object?> shapedDataDictionary = shapedData;
+
+        shapedDataDictionary.Count.Should().Be(2);
+        shapedDataDictionary.Keys.Should().Contain("Id");
+        shapedDataDictionary.Keys.Should().Contain("Name");
     }
 
     [Fact]
     public void ShapeData_FieldDoesNotExist_MustThrowsException()
     {
         // Act & Assert
-        Assert.Throws<Exception>(() => testObjectSource.ShapeData("InvalidField", null));
+        Action action = () => testObjectSource.ShapeData("InvalidField", null);
+        action.Should().Throw<Exception>();
     }
 
     [Fact]
@@ -58,7 +64,8 @@ public class ObjectExtensionsTests
         TestObject? nullTestObject = null;
 
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => nullTestObject.ShapeData("Id", null));
+        Action action = () => nullTestObject.ShapeData("Id", null);
+        action.Should().Throw<ArgumentNullException>();
     }
 
     private class TestObject

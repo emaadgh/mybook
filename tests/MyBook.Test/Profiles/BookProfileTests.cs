@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentAssertions;
 using MyBook.API.Models;
 using MyBook.API.Profiles;
 using MyBook.Entities;
@@ -28,8 +29,8 @@ public class BookProfileTests
         var bookDto = _mapper.Map<BookDto>(book);
 
         // Assert
-        Assert.Equal(book.Id, bookDto.Id);
-        Assert.Equal(book.Title, bookDto.Title);
+        bookDto.Id.Should().Be(book.Id);
+        bookDto.Title.Should().Be(book.Title);
     }
 
     [Fact]
@@ -42,7 +43,7 @@ public class BookProfileTests
         var bookMapped = _mapper.Map<Book>(_mapper.Map<BookDto>(book));
 
         // Assert
-        Assert.Equal(book.Title, bookMapped.Title);
+        bookMapped.Title.Should().Be(book.Title);
     }
 
     [Fact]
@@ -55,7 +56,7 @@ public class BookProfileTests
         var book = _mapper.Map<Book>(bookForCreationDto);
 
         // Assert
-        Assert.Equal(bookForCreationDto.Title, book.Title);
+        book.Title.Should().Be(bookForCreationDto.Title);
     }
 
     [Fact]
@@ -68,7 +69,7 @@ public class BookProfileTests
         var book = _mapper.Map<Book>(bookForUpdateDto);
 
         // Assert
-        Assert.Equal(bookForUpdateDto.Title, book.Title);
+        book.Title.Should().Be(bookForUpdateDto.Title);
     }
 
     [Fact]
@@ -81,6 +82,6 @@ public class BookProfileTests
         var bookForUpdateDtoMapped = _mapper.Map<BookForUpdateDto>(_mapper.Map<Book>(bookForUpdateDto));
 
         // Assert
-        Assert.Equal(bookForUpdateDto.Title, bookForUpdateDtoMapped.Title);
+        bookForUpdateDtoMapped.Title.Should().Be(bookForUpdateDto.Title);
     }
 }

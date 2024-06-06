@@ -1,4 +1,5 @@
-﻿using MyBook.API.ResourceParameters;
+﻿using FluentAssertions;
+using MyBook.API.ResourceParameters;
 
 namespace MyBook.Test.ResourceParameters;
 
@@ -14,7 +15,7 @@ public class AuthorsResourceParametersTests
         parameters.PageSize = 20;
 
         // Assert
-        Assert.Equal(parameters.MaxPageSize, parameters.PageSize);
+        parameters.PageSize.Should().Be(parameters.MaxPageSize);
     }
 
     [Fact]
@@ -27,6 +28,6 @@ public class AuthorsResourceParametersTests
         parameters.PageSize = 7;
 
         // Assert
-        Assert.Equal(7, parameters.PageSize);
+        parameters.PageSize.Should().Be(7);
     }
 }

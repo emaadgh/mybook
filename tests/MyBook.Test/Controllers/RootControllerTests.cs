@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Routing;
@@ -41,9 +42,9 @@ public class RootControllerTests
         var result = controller.GetRoot();
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var links = Assert.IsAssignableFrom<List<LinkDto>>(okResult.Value);
-        Assert.Equal(4, links.Count);
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var links = okResult.Value.Should().BeAssignableTo<List<LinkDto>>().Subject;
+        links.Count.Should().Be(4);
     }
 
     private static Mock<IUrlHelper> CreateMockUrlHelper(ActionContext context)

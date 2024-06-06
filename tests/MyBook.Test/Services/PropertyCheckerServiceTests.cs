@@ -1,4 +1,5 @@
-﻿using MyBook.API.Services;
+﻿using FluentAssertions;
+using MyBook.API.Services;
 using MyBook.Models;
 
 namespace MyBook.Test.Services;
@@ -22,7 +23,7 @@ public class PropertyCheckerServiceTests
         var result = _propertyCheckerService.TypeHasProperties<BookDto>(fields);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -35,7 +36,7 @@ public class PropertyCheckerServiceTests
         var result = _propertyCheckerService.TypeHasProperties<BookDto>(fields);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
     }
 
     [Fact]
@@ -48,7 +49,7 @@ public class PropertyCheckerServiceTests
         var result = _propertyCheckerService.TypeHasProperties<BookDto>(fields);
 
         // Assert
-        Assert.False(result);
+        result.Should().BeFalse();
     }
 
     [Fact]
@@ -61,6 +62,6 @@ public class PropertyCheckerServiceTests
         var result = _propertyCheckerService.TypeHasProperties<BookDto>(fields);
 
         // Assert
-        Assert.True(result);
+        result.Should().BeTrue();
     }
 }
